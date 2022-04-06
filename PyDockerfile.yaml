@@ -1,4 +1,4 @@
-#syntax=cmdjulian/buildkit-python-frontend:v1
+#syntax=cmdjulian/pydockerfile:v1
 apiVersion: v1
 python: 3.9.2
 pip:
@@ -6,4 +6,4 @@ pip:
   - tensorflow==2.5                                  # use tensorflow with specific version
   - git+ssh://git@github.com/echweb/echweb-utils.git # use git with ssh
   - git+https://github.com/moskomule/anatome.git@dev # use git with https and branch
-#  - ./local_pip/                                     # use local fs folder of working directory
+  - ./local_pip_package/                             # use local fs folder of working directory
