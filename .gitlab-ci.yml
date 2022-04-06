@@ -1,13 +1,33 @@
-# You can override the included template(s) by including variable overrides
-# SAST customization: https://docs.gitlab.com/ee/user/application_security/sast/#customizing-the-sast-settings
-# Secret Detection customization: https://docs.gitlab.com/ee/user/application_security/secret_detection/#customizing-settings
-# Dependency Scanning customization: https://docs.gitlab.com/ee/user/application_security/dependency_scanning/#customizing-the-dependency-scanning-settings
-# Container Scanning customization: https://docs.gitlab.com/ee/user/application_security/container_scanning/#customizing-the-container-scanning-settings
-# Note that environment variables can be set in several places
-# See https://docs.gitlab.com/ee/ci/variables/#cicd-variable-precedence
+include:
+  - template: Security/SAST.gitlab-ci.yml
+
 stages:
-- test
+  - test
+  - docker
+
 sast:
   stage: test
-include:
-- template: Security/SAST.gitlab-ci.yml
+
+docker:
+  stage: docker
+  image:
+    name: gcr.io/kaniko-project/executor:v1.8.1-debug@sha256:3bc3f3a05f803cac29164ce12617a7be64931748c944f6c419565f500b65e8db
+    entrypoint: [ "" ]
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  variables:
+    IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
+    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+  before_script:
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
+      > /kaniko/.docker/config.json
+  script: >-
+    /kaniko/executor
+    --use-new-run
+    --context="$CI_PROJECT_DIR"
+    --dockerfile="$CI_PROJECT_DIR/Dockerfile"
+    --destination="$IMAGE_TAG_RELEASE"
+    --destination="$IMAGE_TAG_LATEST"
+    --reproducible
