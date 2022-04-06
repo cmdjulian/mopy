@@ -17,6 +17,8 @@ docker:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: [ ]
+  dependencies: [ ]
   variables:
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
     IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
