@@ -36,9 +36,11 @@ func NewFromBytes(b []byte) (*Config, error) {
 }
 
 type Config struct {
-	ApiVersion      string   `default:"v1" yaml:"apiVersion"`
-	PythonVersion   string   `default:"3.9" yaml:"python"`
-	PipDependencies []string `yaml:"pip"`
+	ApiVersion      string            `default:"v1" yaml:"apiVersion"`
+	PythonVersion   string            `default:"3.9" yaml:"python"`
+	Apt             []string          `yaml:"build-deps"`
+	PipDependencies []string          `yaml:"pip"`
+	Envs            map[string]string `yaml:"envs"`
 }
 
 func (c *Config) Validate() error {

@@ -1,9 +1,12 @@
 #syntax=cmdjulian/pydockerfile:v1
 apiVersion: v1
 python: 3.9.2
+build-deps: [ libopenblas-dev, gfortran, build-essential ] # additional apt dependencies available in build stage
+envs:                                                      # available in build stage and added to the image afterwords
+  MYENV: envVar1
 pip:
-  - keras                                            # use latest version of keras
-  - tensorflow==2.5                                  # use tensorflow with specific version
-  - git+ssh://git@github.com/echweb/echweb-utils.git # use git with ssh
-  - git+https://github.com/moskomule/anatome.git@dev # use git with https and branch
-  - ./local_pip_package/                             # use local fs folder of working directory
+  - keras                                                  # use latest version of keras
+  - tensorflow==2.5                                        # use tensorflow with specific version
+  - git+https://github.com/moskomule/anatome.git@dev       # use git with https and branch
+  - git+ssh://git@github.com/echweb/echweb-utils.git       # use git with ssh
+  - ./local_pip_package/                                   # use local fs folder of working directory

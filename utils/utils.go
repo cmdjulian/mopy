@@ -54,3 +54,17 @@ func After(value string, a string) string {
 	}
 	return value[adjustedPos:len(value)]
 }
+
+func Union(map1 map[string]string, map2 map[string]string) map[string]string {
+	m := make(map[string]string)
+
+	for key, value := range map1 {
+		m[key] = value
+	}
+
+	for key, value := range map2 {
+		m[key] = value
+	}
+
+	return m
+}

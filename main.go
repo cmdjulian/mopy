@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"github.com/moby/buildkit/client/llb"
 	"github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/gateway/grpcclient"
@@ -41,6 +42,7 @@ func printLLB(filename string, out io.Writer) error {
 		return errors.Wrap(err, "opening PyDockerfile")
 	}
 	dockerfile := pydocker.PyDocker2LLB(c)
+	fmt.Println(dockerfile)
 	st, _, _, _ := dockerfile2llb.Dockerfile2LLB(context.TODO(), []byte(dockerfile), dockerfile2llb.ConvertOpt{})
 	dt, err := st.Marshal(context.Background())
 	if err != nil {
