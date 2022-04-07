@@ -32,4 +32,5 @@ docker:
     --dockerfile="$CI_PROJECT_DIR/Dockerfile"
     --destination="$IMAGE_TAG_RELEASE"
     --destination="$IMAGE_TAG_LATEST"
+    --single-snapshot
     --reproducible
