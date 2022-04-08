@@ -7,13 +7,14 @@ import (
 	"strings"
 )
 
+const pipCacheMount = "--mount=type=cache,target=/root/.cache"
+const aptCacheMount = "--mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/apt"
+
 var defaultEnvs = map[string]string{
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
 }
-
-const cacheMount = "--mount=type=cache,target=/root/.cache"
 
 func PyDocker2LLB(c *config.Config) string {
 	dockerfile := buildStage(c)
@@ -41,7 +42,7 @@ func apt(c *config.Config) string {
 	line := "\n"
 
 	if len(c.Apt) > 0 {
-		line += "RUN apt update && apt install -y "
+		line += fmt.Sprintf("RUN %s apt update && apt install -y ", aptCacheMount)
 		for _, apt := range c.Apt {
 			line += fmt.Sprintf("%s ", apt)
 		}
@@ -65,7 +66,7 @@ func installExternalDeps(c *config.Config) string {
 
 	if len(deps) > 0 {
 		depString := strings.Join(deps, " ")
-		line += fmt.Sprintf("RUN %s pip install %s", cacheMount, depString)
+		line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, depString)
 	}
 
 	return line
@@ -77,9 +78,9 @@ func installSshDeps(c *config.Config) string {
 
 	if len(deps) > 0 {
 		depString := strings.Join(deps, " ")
-		line += "RUN apt update && apt install git-lfs\n"
+		line += fmt.Sprintf("RUN %s apt update && apt install git-lfs\n", aptCacheMount)
 		line += "ENV GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"\n"
-		line += fmt.Sprintf("RUN %s --mount=type=ssh pip install %s", cacheMount, depString)
+		line += fmt.Sprintf("RUN %s --mount=type=ssh pip install %s", pipCacheMount, depString)
 	}
 
 	return line
@@ -93,14 +94,14 @@ func installLocalDeps(c *config.Config) string {
 		for _, s := range deps {
 			if strings.HasSuffix(s, "/requirements.txt") {
 				target := "/tmp/requirements.txt"
-				line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", cacheMount, s, target, target)
+				line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", pipCacheMount, s, target, target)
 			} else {
 				s = strings.TrimSuffix(s, "/")
 				source := s + "/"
 				s = utils.After(s, "/") + "/"
 				target := "/tmp/" + s
 				line += fmt.Sprintf("COPY %s %s\n", source, target)
-				line += fmt.Sprintf("RUN %s pip install %s", cacheMount, target)
+				line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, target)
 			}
 		}
 	}
