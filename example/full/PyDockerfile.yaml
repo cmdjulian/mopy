@@ -1,0 +1,15 @@
+#syntax=cmdjulian/pydockerfile:v1
+apiVersion: v1
+python: 3.9.2
+build-deps: [ libopenblas-dev, gfortran, build-essential ] # additional apt dependencies available in build stage
+envs:                                                      # available in build stage and in the final image
+  MYENV: envVar1
+pip:
+  - numpy                                                  # use latest version of keras
+  - slycot                                                 # use numpy with specific version
+  - git+https://github.com/moskomule/anatome.git@dev       # use git with https and branch
+  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git       # use git with ssh
+  #- ./my_local_pip/                                        # use local fs folder of working directory
+  - ./requirements.txt                                     # installation from requirements.txt file
+# Link to Python file to run, also a dir is possible, dir is expected to contain main.py
+project: my-python-app/

@@ -39,8 +39,9 @@ type Config struct {
 	ApiVersion      string            `default:"v1" yaml:"apiVersion"`
 	PythonVersion   string            `default:"3.9" yaml:"python"`
 	Apt             []string          `yaml:"build-deps"`
-	PipDependencies []string          `yaml:"pip"`
 	Envs            map[string]string `yaml:"envs"`
+	PipDependencies []string          `yaml:"pip"`
+	Project         string            `yaml:"project"`
 }
 
 func (c *Config) Validate() error {
@@ -59,6 +60,15 @@ func (c *Config) Validate() error {
 	invalidPaths := c.dependenciesFilteredByPrefix("/")
 	if len(invalidPaths) > 0 {
 		return fmt.Errorf("local paths can only be relative, found: %s", strings.Join(invalidPaths, ", "))
+	}
+
+	if c.Project != "" {
+		if strings.HasPrefix(c.Project, "/") {
+			return fmt.Errorf("project path can't be absolute, has to be relative, found: %s", c.Project)
+		}
+		if !strings.HasPrefix(c.Project, "./") {
+			c.Project = "./" + c.Project
+		}
 	}
 
 	return nil

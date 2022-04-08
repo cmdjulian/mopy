@@ -8,19 +8,26 @@ import (
 )
 
 var defaultEnvs = map[string]string{
-	"PIP_NO_CACHE_DIR":              "1",
+	"PIP_NO_CACHE_DIR":              "0",
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
+	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
 }
 
 func PyDocker2LLB(c *config.Config) string {
+	dockerfile := buildStage(c)
+	dockerfile += runStage(c)
+
+	return dockerfile
+}
+
+func buildStage(c *config.Config) string {
 	dockerfile := from(c)
 	dockerfile += apt(c)
 	dockerfile += env(utils.Union(defaultEnvs, c.Envs))
 	dockerfile += installExternalDeps(c)
 	dockerfile += installLocalDeps(c)
 	dockerfile += installSshDeps(c)
-	dockerfile += multistage(c)
 
 	return dockerfile
 }
@@ -78,24 +85,29 @@ func installSshDeps(c *config.Config) string {
 }
 
 func installLocalDeps(c *config.Config) string {
-	line := "\n"
+	line := ""
 	deps := c.LocalDependencies()
 
 	if len(deps) > 0 {
 		for _, s := range deps {
-			s = strings.TrimSuffix(s, "/")
-			source := s + "/"
-			s = utils.After(s, "/") + "/"
-			target := "/tmp/" + s
-			line += fmt.Sprintf("COPY %s %s\n", source, target)
-			line += fmt.Sprintf("RUN pip install %s", target)
+			if strings.HasSuffix(s, "/requirements.txt") {
+				target := "/tmp/requirements.txt"
+				line += fmt.Sprintf("\nRUN --mount=type=bind,source=%s,target=%s pip install -r %s", s, target, target)
+			} else {
+				s = strings.TrimSuffix(s, "/")
+				source := s + "/"
+				s = utils.After(s, "/") + "/"
+				target := "/tmp/" + s
+				line += fmt.Sprintf("COPY %s %s\n", source, target)
+				line += fmt.Sprintf("RUN pip install %s", target)
+			}
 		}
 	}
 
 	return line
 }
 
-func multistage(c *config.Config) string {
+func runStage(c *config.Config) string {
 	line := "\n"
 	if strings.HasPrefix(c.PythonVersion, "3.9") {
 		line += distroless39()
@@ -103,12 +115,16 @@ func multistage(c *config.Config) string {
 		line += fallback(c)
 	}
 
+	if len(c.Envs) > 0 {
+		line += env(c.Envs)
+	}
+
 	if len(c.PipDependencies) > 0 {
 		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
 	}
 
-	if len(c.Envs) > 0 {
-		line += env(c.Envs)
+	if c.Project != "" {
+		line += project(c)
 	}
 
 	return line
@@ -122,6 +138,25 @@ func fallback(c *config.Config) string {
 	line := fmt.Sprintf("FROM python:%s-slim\n", c.PythonVersion)
 	line += "RUN useradd --uid=65532 --user-group --home-dir=/home/nonroot --create-home nonroot\n"
 	line += "USER 65532:65532"
+
+	return line
+}
+
+func project(c *config.Config) string {
+	line := "\n"
+
+	project := strings.TrimSuffix(c.Project, "/")
+	source := "/home/nonroot/" + utils.After(project, "/")
+	line += fmt.Sprintf("COPY --chown=nonroot:nonroot %s %s\n", c.Project, source)
+	line += "ENTRYPOINT [ \"python\", \"-u\" ]\n"
+
+	if strings.HasSuffix(c.Project, ".py") {
+		line += "WORKDIR /home/nonroot\n"
+		line += fmt.Sprintf("CMD [ \"%s\" ]", source)
+	} else {
+		line += fmt.Sprintf("WORKDIR %s\n", source)
+		line += "CMD [ \"main.py\" ]"
+	}
 
 	return line
 }
