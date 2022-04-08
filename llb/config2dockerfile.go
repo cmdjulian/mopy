@@ -8,11 +8,12 @@ import (
 )
 
 var defaultEnvs = map[string]string{
-	"PIP_NO_CACHE_DIR":              "0",
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
 }
+
+const cacheMount = "--mount=type=cache,target=/root/.cache"
 
 func PyDocker2LLB(c *config.Config) string {
 	dockerfile := buildStage(c)
@@ -64,7 +65,7 @@ func installExternalDeps(c *config.Config) string {
 
 	if len(deps) > 0 {
 		depString := strings.Join(deps, " ")
-		line += fmt.Sprintf("RUN pip install %s", depString)
+		line += fmt.Sprintf("RUN %s pip install %s", cacheMount, depString)
 	}
 
 	return line
@@ -78,7 +79,7 @@ func installSshDeps(c *config.Config) string {
 		depString := strings.Join(deps, " ")
 		line += "RUN apt update && apt install git-lfs\n"
 		line += "ENV GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"\n"
-		line += fmt.Sprintf("RUN --mount=type=ssh pip install %s", depString)
+		line += fmt.Sprintf("RUN %s --mount=type=ssh pip install %s", cacheMount, depString)
 	}
 
 	return line
@@ -92,14 +93,14 @@ func installLocalDeps(c *config.Config) string {
 		for _, s := range deps {
 			if strings.HasSuffix(s, "/requirements.txt") {
 				target := "/tmp/requirements.txt"
-				line += fmt.Sprintf("\nRUN --mount=type=bind,source=%s,target=%s pip install -r %s", s, target, target)
+				line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", cacheMount, s, target, target)
 			} else {
 				s = strings.TrimSuffix(s, "/")
 				source := s + "/"
 				s = utils.After(s, "/") + "/"
 				target := "/tmp/" + s
 				line += fmt.Sprintf("COPY %s %s\n", source, target)
-				line += fmt.Sprintf("RUN pip install %s", target)
+				line += fmt.Sprintf("RUN %s pip install %s", cacheMount, target)
 			}
 		}
 	}
