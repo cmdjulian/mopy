@@ -34,5 +34,5 @@ docker:
     --destination="$IMAGE_TAG_LATEST"
     --single-snapshot
     --reproducible
-    --logformat=color
+    --log-format=color
     --log-timestamp=true
