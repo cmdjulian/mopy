@@ -1,13 +1,19 @@
-# syntax=docker/dockerfile:1.4
-FROM golang:1.16-buster AS builder
-WORKDIR $GOPATH/src/buildkit-frontend-for-python
+FROM golang:alpine AS builder
+LABEL stage=gobuilder
+ENV CGO_ENABLED 0
+RUN apk update --no-cache && apk add --no-cache tzdata upx
+WORKDIR /build
 COPY . .
-RUN --mount=type=cache,target=/go/pkg go get -d -v
-RUN --mount=type=cache,target=/root/.cache/go-build CGO_ENABLED=0 go build -ldflags '-extldflags "-static"' -o /go/src/pydockerfile
+RUN --mount=type=cache,target=/go/pkg go build -ldflags="-s -w" -o /app/pydockerfile ./main.go
+RUN upx /app/pydockerfile
 
 FROM scratch
-COPY --from=builder /go/src/pydockerfile /pydockerfile
-COPY --from=alpine:latest /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/
-COPY --from=alpine:latest /etc/passwd /etc/passwd
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --from=builder /usr/share/zoneinfo/Europe/Berlin /usr/share/zoneinfo/Europe/Berlin
+COPY --from=builder /etc/passwd /etc/passwd
 USER 65534:65524
-ENTRYPOINT ["/pydockerfile"]
+ENV TZ Europe/Berlin
+COPY --from=builder --chown=65534:65534 /app/pydockerfile /app/pydockerfile
+WORKDIR /app
+
+ENTRYPOINT ["/app/pydockerfile"]
