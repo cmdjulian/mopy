@@ -14,7 +14,7 @@ COPY --from=builder /etc/passwd /etc/passwd
 COPY --from=builder /etc/group /etc/group
 USER 65534:65524
 ENV TZ Europe/Berlin
-COPY --from=builder --chown=65534:65534 /app/pydockerfile /app/pydockerfile
+COPY --from=builder --chown=65534:65534 /app /app
 WORKDIR /app
 
 ENTRYPOINT ["/app/pydockerfile"]
