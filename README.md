@@ -37,15 +37,20 @@ pip:
 project: my-python-app/
 ```
 
-`python` is the only two required field and specifies the version of the used python interpreter.  
+`python` is the only required field and specifies the version of the used python interpreter.
+
 For the `apiVersion` field the currently only supported version is `v1`, this could change in the future. If you omit
-the version field, `v1` is assumed.  
-`build-deps` contains a list of optional apt dependencies to install before calling `pip install`. Additionally, a
+the version field, `v1` is assumed.
+
+`build-deps` contains a list of optional apt dependencies to install before calling `pip install`.
+
+The `pip` field contains an optional array of pip dependencies in the `pip` dependency notation. Additionally, a
 relative path to a `requirements.txt` is supported. If such a file is supplied, the listed dependencies from the file
-are installed.  
-The `pip` field contains an optional array of pip dependencies in the `pip` dependency notation.  
+are installed.
+
 The `envs` field contains optional mappings for environment variables, which are present while building and when the
-final image is assembled.  
+final image is assembled.
+
 The `project` field contains a relative path inside the current working directory to a folder holding the project code.
 This project folder has to contain a `main.py` file. Also, a path to a single python file is supported. Omitting
 the `project` field doesn't set an entrypoint and only creates an image consisting of the specified `python` version and
