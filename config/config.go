@@ -45,7 +45,7 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	if c.ApiVersion != "v1" {
+	if c.ApiVersion != "" && c.ApiVersion != "v1" {
 		return fmt.Errorf("unknown version %s. Known versions: 'v1'", c.ApiVersion)
 	}
 

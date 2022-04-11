@@ -133,7 +133,7 @@ func runStage(c *config.Config) string {
 }
 
 func distroless39() string {
-	return "FROM gcr.io/distroless/python3:nonroot@sha256:59e6b46683dc13d0267729efc94e04cefb85e29a78fa64109685e6c7afdc95eb"
+	return "FROM gcr.io/distroless/python3:nonroot@sha256:a5d8ca63eee13112d706645099d875c9ac8c7829c78ba2b2afca9045ca761f1c"
 }
 
 func fallback(c *config.Config) string {
