@@ -19,8 +19,12 @@ docker:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs: [ ]
   dependencies: [ ]
+  services:
+    - alias: buildkitd
+      name: moby/buildkit:rootless
+      command: [ --oci-worker-no-process-sandbox, --addr, tcp://0.0.0.0:1234 ]
   variables:
-    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
+    BUILDKIT_HOST: tcp://buildkitd:1234
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
     IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
   before_script:
@@ -28,7 +32,7 @@ docker:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
       > ~/.docker/config.json
   script: >-
-    buildctl-daemonless.sh build
+    buildctl build
     --frontend=dockerfile.v0
     --local context=.
     --local dockerfile=.
