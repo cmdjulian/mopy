@@ -5,7 +5,7 @@ ENV CGO_ENABLED=0
 RUN --mount=type=cache,target=/etc/apk/cache apk update && apk add upx tzdata
 WORKDIR /build
 COPY --link . .
-RUN --mount=type=cache,target=/go/pkg go get -u ./... && go mod download
+RUN --mount=type=cache,target=/go/pkg go mod download
 ARG TARGETOS TARGETARCH
 RUN --mount=type=cache,target=/root/.cache/go-build <<EOF
     GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /app/pydockerfile ./main.go
