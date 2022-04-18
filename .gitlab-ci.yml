@@ -17,15 +17,16 @@ docker:
     - if: $CI_PIPELINE_SOURCE == "schedule"
       when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+  needs: [ ]
+  dependencies: [ ]
   variables:
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
     IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
   before_script:
-    - |
-      mkdir ~/.docker
-      auth=$(echo -n "$CI_REGISTRY_USER:$CI_REGISTRY_PASSWORD" | base64)
-      echo "{\"auths\": {\"$CI_REGISTRY\": {\"auth\": \"$auth\"}}}" > ~/.docker/config.json
+    - mkdir ~/.docker
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
+      > ~/.docker/config.json
   script: >-
     buildctl-daemonless.sh build
     --frontend=dockerfile.v0
@@ -33,7 +34,7 @@ docker:
     --local dockerfile=.
     --import-cache type=registry,ref=$IMAGE_TAG_LATEST
     --export-cache type=inline
-    --output type=image,name=$IMAGE_TAG_LATEST,$IMAGE_TAG_RELEASE,push=true
+    --output type=image,\"name=$IMAGE_TAG_RELEASE,$IMAGE_TAG_LATEST\",push=true
 
 .docker:
   stage: docker
