@@ -18,6 +18,6 @@ COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-
 USER 65534:65524
 ENV TZ=Europe/Berlin USER=nobody SSL_CERT_DIR=/etc/ssl/certs PATH=/app
 WORKDIR /app
-COPY --link --from=builder --chown=nobody:nobody /app/pydockerfile .
+COPY --link --from=builder --chown=65534:65534 /app/pydockerfile .
 
 ENTRYPOINT ["/app/pydockerfile"]
