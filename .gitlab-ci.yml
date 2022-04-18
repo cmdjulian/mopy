@@ -19,7 +19,7 @@ docker:
   variables:
     GITLAB_RELEASE: $CI_REGISTRY_IMAGE:v1
     GITLAB_LATEST: $CI_REGISTRY_IMAGE:latest
-    CACHE_IMAGE: $CI_REGISTRY_IMAGE/cache
+    CACHE_IMAGE: $CI_REGISTRY_IMAGE/buildcache
     DOCKER_HUB_AUTH_URL: https://index.docker.io/v1/
     DOCKER_HUB_RELEASE: cmdjulian/pydockerfile:v1
     DOCKER_HUB_LATEST: cmdjulian/pydockerfile:latest
@@ -41,7 +41,7 @@ docker:
     --frontend=dockerfile.v0
     --local context=.
     --local dockerfile=.
-    --export-cache type=inline
-    --import-cache type=registry,ref=$DOCKER_HUB_LATEST
+    --export-cache type=registry,mode=max,ref=$CACHE_IMAGE
+    --import-cache type=registry,ref=$CACHE_IMAGE
     --opt platform="$PLATFORMS"
     --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",push=true
