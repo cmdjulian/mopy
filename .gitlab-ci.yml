@@ -20,47 +20,28 @@ docker:
   needs: [ ]
   dependencies: [ ]
   variables:
-    IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
-    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
+    GITLAB_RELEASE: $CI_REGISTRY_IMAGE:v1
+    GITLAB_LATEST: $CI_REGISTRY_IMAGE:latest
+    CACHE_IMAGE: $CI_REGISTRY_IMAGE:cache
+    DOCKER_HUB_AUTH_URL: https://index.docker.io/v1/
+    DOCKER_HUB_RELEASE: cmdjulian/pydockerfile:v1
+    DOCKER_HUB_LATEST: cmdjulian/pydockerfile:latest
   before_script:
+    - apk add --no-cache jq moreutils
     - mkdir ~/.docker
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
       > ~/.docker/config.json
+    - >-
+      cat ~/.docker/config.json |
+      jq ".auths += {\"$DOCKER_HUB_AUTH_URL\": {
+        auth: \"$(echo -n "$DOCKER_HUB_USER:$DOCKER_HUB_PASSWORD" | base64)\"
+      }}" | sponge ~/.docker/config.json
   script: >-
     buildctl-daemonless.sh build
     --frontend=dockerfile.v0
     --local context=.
     --local dockerfile=.
-    --import-cache type=registry,ref=$IMAGE_TAG_LATEST
-    --export-cache type=inline
-    --opt platform=linux/amd64,linux/arm64
-    --output type=image,\"name=$IMAGE_TAG_RELEASE,$IMAGE_TAG_LATEST\",push=true
-
-.docker:
-  stage: docker
-  image:
-    name: gcr.io/kaniko-project/executor:v1.8.1-debug@sha256:3bc3f3a05f803cac29164ce12617a7be64931748c944f6c419565f500b65e8db
-    entrypoint: [ "" ]
-  rules:
-    - if: $CI_PIPELINE_SOURCE == "schedule"
-      when: never
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  needs: [ ]
-  dependencies: [ ]
-  variables:
-    IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
-    IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
-  before_script:
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
-      > /kaniko/.docker/config.json
-  script: >-
-    /kaniko/executor
-    --use-new-run
-    --context="$CI_PROJECT_DIR"
-    --dockerfile="$CI_PROJECT_DIR/Dockerfile"
-    --destination="$IMAGE_TAG_RELEASE"
-    --destination="$IMAGE_TAG_LATEST"
-    --single-snapshot
-    --reproducible
-    --log-format=color
-    --log-timestamp=true
+    --export-cache type=registry,mode=max,ref=$CACHE_IMAGE
+    --import-cache type=registry,ref=$CACHE_IMAGE
+    --opt platform=linux/amd64,linux/arm64,linux/arm/v7
+    --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",push=true
