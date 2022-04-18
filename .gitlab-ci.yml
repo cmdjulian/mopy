@@ -20,7 +20,6 @@ docker:
   needs: [ ]
   dependencies: [ ]
   variables:
-    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
     IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
   before_script:
