@@ -21,8 +21,8 @@ docker:
   dependencies: [ ]
   services:
     - alias: buildkitd
-      name: moby/buildkit:rootless
-      command: [ --oci-worker-no-process-sandbox, --addr, tcp://0.0.0.0:1234 ]
+      name: moby/buildkit:latest
+      command: [ --addr, tcp://0.0.0.0:1234 ]
   variables:
     BUILDKIT_HOST: tcp://buildkitd:1234
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
