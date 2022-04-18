@@ -11,7 +11,7 @@ sast:
 docker:
   stage: docker
   image:
-    name: moby/buildkit:rootless
+    name: moby/buildkit:latest
     entrypoint: [ "sh", "-c" ]
   rules:
     - if: $CI_PIPELINE_SOURCE == "schedule"
@@ -21,7 +21,7 @@ docker:
   dependencies: [ ]
   services:
     - alias: buildkitd
-      name: moby/buildkit:rootless
+      name: moby/buildkit:latest
       command: [ --oci-worker-no-process-sandbox, --addr, tcp://0.0.0.0:1234 ]
   variables:
     BUILDKIT_HOST: tcp://buildkitd:1234
