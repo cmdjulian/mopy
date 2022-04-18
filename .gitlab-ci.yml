@@ -22,7 +22,7 @@ docker:
   variables:
     GITLAB_RELEASE: $CI_REGISTRY_IMAGE:v1
     GITLAB_LATEST: $CI_REGISTRY_IMAGE:latest
-    CACHE_IMAGE: cmdjulian/pydockerfile/cache
+    CACHE_IMAGE: cmdjulian/pydockerfile-cache
     DOCKER_HUB_AUTH_URL: https://index.docker.io/v1/
     DOCKER_HUB_RELEASE: cmdjulian/pydockerfile:v1
     DOCKER_HUB_LATEST: cmdjulian/pydockerfile:latest
