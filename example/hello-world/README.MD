@@ -1,3 +1,4 @@
 ```bash
-docker build --rm -t hello-world:latest -f PyDockerfile.yaml .
+docker build -t hello-world:latest -f PyDockerfile.yaml .
+docker run --rm hello-world:latest
 ```
