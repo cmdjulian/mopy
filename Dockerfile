@@ -7,7 +7,7 @@ WORKDIR /build
 ARG TARGETOS TARGETARCH
 RUN --mount=target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg <<EOF
     GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /app/pydockerfile ./main.go
-    upx /app/pydockerfile \
+    upx /app/pydockerfile
 EOF
 
 # final image
