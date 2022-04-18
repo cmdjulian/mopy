@@ -19,12 +19,7 @@ docker:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
   needs: [ ]
   dependencies: [ ]
-  services:
-    - alias: buildkitd
-      name: moby/buildkit:latest
-      command: [ --addr, tcp://0.0.0.0:1234 ]
   variables:
-    BUILDKIT_HOST: tcp://buildkitd:1234
     IMAGE_TAG_RELEASE: $CI_REGISTRY_IMAGE:v1
     IMAGE_TAG_LATEST: $CI_REGISTRY_IMAGE:latest
   before_script:
@@ -32,12 +27,14 @@ docker:
     - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
       > ~/.docker/config.json
   script: >-
-    buildctl build
+    buildctl-daemonless.sh build
     --frontend=dockerfile.v0
     --local context=.
     --local dockerfile=.
     --import-cache type=registry,ref=$IMAGE_TAG_LATEST
     --export-cache type=inline
+    --opt platform=linux/amd64
+    --opt platform=linux/arm64
     --output type=image,\"name=$IMAGE_TAG_RELEASE,$IMAGE_TAG_LATEST\",push=true
 
 .docker:
