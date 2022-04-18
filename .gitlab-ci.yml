@@ -33,8 +33,7 @@ docker:
     --local dockerfile=.
     --import-cache type=registry,ref=$IMAGE_TAG_LATEST
     --export-cache type=inline
-    --opt platform=linux/amd64
-    --opt platform=linux/arm64
+    --opt platform=linux/amd64,linux/arm64
     --output type=image,\"name=$IMAGE_TAG_RELEASE,$IMAGE_TAG_LATEST\",push=true
 
 .docker:
