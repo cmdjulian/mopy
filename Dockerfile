@@ -15,7 +15,7 @@ FROM scratch
 COPY --link --from=builder /usr/share/zoneinfo/Europe/Berlin /usr/share/zoneinfo/Europe/Berlin
 COPY --link --from=builder /etc/passwd /etc/group /etc/
 COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
-USER 65534:65524
+USER 65534:65534
 ENV TZ=Europe/Berlin USER=nobody SSL_CERT_DIR=/etc/ssl/certs PATH=/app
 WORKDIR /app
 COPY --link --from=builder --chown=65534:65534 /app/pydockerfile .
