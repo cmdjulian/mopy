@@ -92,8 +92,7 @@ The build image can be run like any other container:
 
 ```bash
 $ docker run --rm example:latest
-
+```
 
 ## Credits
 - https://earthly.dev/blog/compiling-containers-dockerfiles-llvm-and-buildkit/
-```
