@@ -28,7 +28,7 @@ docker:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
-    - mkdir $HOME/.docker
+    - mkdir -p $HOME/.docker
     - "echo -e '{\n  \"experimental\": \"enabled\"\n}' | tee $HOME/.docker/config.json"
     - docker version
     - wget -O /usr/bin/docker-buildx
