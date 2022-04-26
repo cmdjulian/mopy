@@ -26,11 +26,11 @@ docker:
     DOCKER_BUILDKIT: "1"
     DOCKER_CONTENT_TRUST: "1"
   before_script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
-    - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
     - mkdir -p $HOME/.docker
     - "echo -e '{\n  \"experimental\": \"enabled\"\n}' | tee $HOME/.docker/config.json"
     - docker version
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
+    - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
     - wget -O /usr/bin/docker-buildx
       https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.${BUILDX_ARCH}
     - chmod +x /usr/bin/docker-buildx
@@ -38,8 +38,10 @@ docker:
   script: >-
     docker-buildx build
     --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+    --rm
     --squash
-    --build-arg BUILDKIT_INLINE_CACHE=1
+    --compress
+    --cache-to type=inline
     --cache-from cmdjulian/pydockerfile:v1
     --tag $CI_REGISTRY_IMAGE:v1
     --tag $CI_REGISTRY_IMAGE:latest
