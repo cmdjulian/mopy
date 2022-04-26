@@ -162,7 +162,7 @@ func labels(pythonVersion string) string {
 	}
 
 	for key, value := range utils.Union(defaulLabels, labels) {
-		line += fmt.Sprintf(" %s=%s", key, value)
+		line += fmt.Sprintf(" %s=\"%s\"", key, value)
 	}
 
 	return line
