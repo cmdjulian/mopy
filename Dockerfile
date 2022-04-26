@@ -12,6 +12,14 @@ EOF
 
 # final image
 FROM scratch
+LABEL org.opencontainers.image.url="https://gitlab.com/cmdjulian/pydockerfile" \
+      org.opencontainers.image.source="https://gitlab.com/cmdjulian/pydockerfile" \
+      org.opencontainers.image.version="v1" \
+      org.opencontainers.image.title="PyDockerfile" \
+      org.opencontainers.image.description="Buildkit frontend for building Python Docker Images" \
+      org.opencontainers.image.documentation="https://gitlab.com/cmdjulian/pydockerfile" \
+      org.opencontainers.image.authors="cmdjulian" \
+      org.opencontainers.image.licenses="MIT"
 COPY --link --from=builder /usr/share/zoneinfo/Europe/Berlin /usr/share/zoneinfo/Europe/Berlin
 COPY --link --from=builder /etc/passwd /etc/group /etc/
 COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
