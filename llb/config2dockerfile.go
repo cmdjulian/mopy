@@ -14,6 +14,7 @@ var defaultEnvs = map[string]string{
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
+	"PYTHONPYCACHEPREFIX":           "$HOME/.pycache",
 }
 
 func PyDocker2LLB(c *config.Config) string {
