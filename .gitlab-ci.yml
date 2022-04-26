@@ -17,7 +17,8 @@ docker:
   needs: [ ]
   dependencies: [ ]
   services:
-    - docker:20-dind
+    - name: docker:20-dind
+      command: [ --experimental ]
   variables:
     DOCKER_DRIVER: overlay2
     BUILDX_VERSION: v0.8.2
@@ -27,6 +28,9 @@ docker:
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
+    - mkdir $HOME/.docker
+    - "echo -e '{\n  \"experimental\": \"enabled\"\n}' | tee $HOME/.docker/config.json"
+    - docker version
     - wget -O /usr/bin/docker-buildx
       https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.${BUILDX_ARCH}
     - chmod +x /usr/bin/docker-buildx
