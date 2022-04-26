@@ -37,9 +37,8 @@ docker:
     --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
     --rm
     --squash
-    --compress
-    --cache-from type=registry,ref=$CI_REGISTRY_IMAGE:cache
-    --cache-to type=registry,ref=$CI_REGISTRY_IMAGE:cache
+    --cache-to type=inline
+    --cache-from cmdjulian/pydockerfile:v1
     --tag $CI_REGISTRY_IMAGE:v1
     --tag $CI_REGISTRY_IMAGE:latest
     --tag cmdjulian/pydockerfile:v1
