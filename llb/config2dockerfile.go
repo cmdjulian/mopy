@@ -30,6 +30,7 @@ func buildStage(c *config.Config) string {
 	dockerfile += installExternalDeps(c)
 	dockerfile += installLocalDeps(c)
 	dockerfile += installSshDeps(c)
+	dockerfile += cleanCacheDataFromInstalled(c)
 
 	return dockerfile
 }
@@ -104,6 +105,18 @@ func installLocalDeps(c *config.Config) string {
 				line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, target)
 			}
 		}
+	}
+
+	return line
+}
+
+func cleanCacheDataFromInstalled(c *config.Config) string {
+	line := "\n"
+	if len(c.PipDependencies) > 0 {
+		line += "RUN find ~/.local/lib/python3.*/ -name 'tests' -exec rm -r '{}' +\n"
+		line += "RUN find ~/.local/lib/python3.*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\;\n"
+		line += "RUN find ~ -type f -name '*.pyc' -delete\n"
+		line += "RUN find ~ -type d -name '__pycache__' -delete\n"
 	}
 
 	return line
