@@ -12,7 +12,7 @@ sast:
 
 docker:
   stage: docker
-  image: carlallen/docker:buildx
+  image: jdrouet/docker-with-buildx:0.8.2
   rules: [ { if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule" } ]
   needs: [ ]
   dependencies: [ ]
