@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/config"
 	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/utils"
+	"runtime"
 	"strings"
 )
 
@@ -120,22 +121,29 @@ func installLocalDeps(c *config.Config) string {
 func cleanCacheDataFromInstalled(c *config.Config) string {
 	line := "\n"
 	if len(c.PipDependencies) > 0 {
-		line += "RUN find ~/.local/lib/python3.*/ -name 'tests' -exec rm -r '{}' +\n"
-		line += "RUN find ~/.local/lib/python3.*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\;\n"
-		line += "RUN find ~ -type f -name '*.pyc' -delete\n"
-		line += "RUN find ~ -type d -name '__pycache__' -delete\n"
+		line += "RUN find ~/.local/lib/python3.*/ -name 'tests' -exec rm -r '{}' + && "
+		line += "find ~/.local/lib/python3.*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\; && "
+		line += "find ~ -type f -name '*.pyc' -delete && "
+		line += "find ~ -type d -name '__pycache__' -delete\n"
 	}
 
 	return line
 }
 
+func determineFinalBaseImage(c *config.Config) string {
+	if strings.HasPrefix(c.PythonVersion, "3.9") {
+		switch runtime.GOARCH {
+		case "arm64", "amd64":
+			return distroless39()
+		}
+	}
+
+	return fallback(c)
+}
+
 func runStage(c *config.Config) string {
 	line := "\n"
-	if strings.HasPrefix(c.PythonVersion, "3.9") {
-		line += distroless39()
-	} else {
-		line += fallback(c)
-	}
+	line += determineFinalBaseImage(c)
 
 	if len(c.Envs) > 0 {
 		line += env(c.Envs)
@@ -155,7 +163,7 @@ func runStage(c *config.Config) string {
 }
 
 func distroless39() string {
-	return "FROM gcr.io/distroless/python3:nonroot@sha256:a5d8ca63eee13112d706645099d875c9ac8c7829c78ba2b2afca9045ca761f1c"
+	return "FROM gcr.io/distroless/python3:nonroot@sha256:49aeb0efbe5c01375e6d747c138c87cf89c6aa4dc5daac955b9afb6aba4027e4"
 }
 
 func fallback(c *config.Config) string {
