@@ -32,28 +32,16 @@ docker:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
     - docker buildx create --driver=docker-container --name=buildkit-builder --use
-    - docker pull $CI_REGISTRY_IMAGE:builder || true
-  script:
-    - docker buildx build
-      --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-      --rm
-      --squash
-      --cache-to type=inline
-      --cache-from $CI_REGISTRY_IMAGE:builder
-      --target builder
-      -t $CI_REGISTRY_IMAGE:builder
-      --push
-      .
-    - docker buildx build
-      --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-      --rm
-      --squash
-      --cache-to type=inline
-      --cache-from $CI_REGISTRY_IMAGE:builder
-      --cache-from cmdjulian/pydockerfile:v1
-      --tag $CI_REGISTRY_IMAGE:v1
-      --tag $CI_REGISTRY_IMAGE:latest
-      --tag cmdjulian/pydockerfile:v1
-      --tag cmdjulian/pydockerfile:latest
-      --push
-      .
+  script: >-
+    docker buildx build
+    --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+    --rm
+    --squash
+    --cache-to type=inline
+    --cache-from cmdjulian/pydockerfile:v1
+    --tag $CI_REGISTRY_IMAGE:v1
+    --tag $CI_REGISTRY_IMAGE:latest
+    --tag cmdjulian/pydockerfile:v1
+    --tag cmdjulian/pydockerfile:latest
+    --push
+    .
