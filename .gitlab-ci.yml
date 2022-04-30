@@ -13,7 +13,7 @@ sast:
 docker:
   stage: docker
   image:
-    name: moby/buildkit:v0.10.2-rootless
+    name: moby/buildkit:v0.10.2
     entrypoint: [ "sh", "-c" ]
   rules: [ { if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule" } ]
   needs: [ ]
@@ -25,7 +25,6 @@ docker:
     DOCKER_HUB_RELEASE: cmdjulian/pydockerfile:v1
     DOCKER_HUB_LATEST: cmdjulian/pydockerfile:latest
     PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
     - mkdir -p ~/.docker
     # gitlab registry and docker hub login
@@ -42,4 +41,3 @@ docker:
     --import-cache type=registry,ref=$DOCKER_HUB_LATEST
     --opt platform="$PLATFORMS"
     --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",push=true
-  tags: [ docker ]
