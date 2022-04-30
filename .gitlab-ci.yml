@@ -36,9 +36,10 @@ docker:
     docker buildx build
     --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
     --rm
-    --squash
     --cache-to type=inline
     --cache-from cmdjulian/pydockerfile:v1
+    --build-arg BUILDKIT_MULTI_PLATFORM=true
+    --build-arg BUILDKIT_SYNTAX=docker/dockerfile:1.4
     --tag $CI_REGISTRY_IMAGE:v1
     --tag $CI_REGISTRY_IMAGE:latest
     --tag cmdjulian/pydockerfile:v1

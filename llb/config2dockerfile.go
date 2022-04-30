@@ -35,9 +35,9 @@ func buildStage(c *config.Config) string {
 	dockerfile := from(c)
 	dockerfile += apt(c)
 	dockerfile += env(utils.Union(defaultEnvs, c.Envs))
+	dockerfile += installSshDeps(c)
 	dockerfile += installExternalDeps(c)
 	dockerfile += installLocalDeps(c)
-	dockerfile += installSshDeps(c)
 	dockerfile += cleanCacheDataFromInstalled(c)
 
 	return dockerfile
@@ -50,11 +50,14 @@ func from(c *config.Config) string {
 func apt(c *config.Config) string {
 	line := "\n"
 
-	if len(c.Apt) > 0 {
+	if len(c.HttpDependencies()) > 0 || len(c.SshDependencies()) > 0 {
+		line += fmt.Sprintf("RUN %s apt update && apt install -y git-lfs", aptCacheMount)
+	} else if len(c.Apt) > 0 {
 		line += fmt.Sprintf("RUN %s apt update && apt install -y ", aptCacheMount)
-		for _, apt := range c.Apt {
-			line += fmt.Sprintf("%s ", apt)
-		}
+	}
+
+	for _, apt := range c.Apt {
+		line += fmt.Sprintf(" %s", apt)
 	}
 
 	return line
@@ -87,9 +90,8 @@ func installSshDeps(c *config.Config) string {
 
 	if len(deps) > 0 {
 		depString := strings.Join(deps, " ")
-		line += fmt.Sprintf("RUN %s apt update && apt install git-lfs\n", aptCacheMount)
 		line += "ENV GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"\n"
-		line += fmt.Sprintf("RUN %s --mount=type=ssh pip install %s", pipCacheMount, depString)
+		line += fmt.Sprintf("RUN %s --mount=type=ssh,required=true pip install %s", pipCacheMount, depString)
 	}
 
 	return line

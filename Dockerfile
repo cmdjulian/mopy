@@ -3,12 +3,19 @@
 FROM --platform=$BUILDPLATFORM golang:1.16-alpine AS builder
 ENV CGO_ENABLED=0
 WORKDIR /build
-RUN --mount=type=cache,target=/etc/apk/cache apk update && apk add upx tzdata
+RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
 ARG TARGETOS TARGETARCH
-RUN --mount=target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg <<EOF
-    GOOS=$TARGETOS GOARCH=$TARGETARCH go build -ldflags="-s -w" -o /app/pydockerfile ./main.go
-    upx /app/pydockerfile
-EOF
+ENV GOOS=$TARGETOS GOARCH=$TARGETARCH
+RUN --mount=type=bind,target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg \
+    go build -ldflags="-s -w" -o /frontend/pydockerfile ./main.go
+RUN upx /frontend/pydockerfile
+
+# create image with all required files for squashing in later stage
+FROM scratch AS squash
+COPY --link --from=builder /etc/passwd /etc/group /etc/
+COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --link --from=builder /usr/share/zoneinfo/Europe/Berlin /usr/share/zoneinfo/Europe/Berlin
+COPY --link --from=builder --chown=65534:65534 /frontend/pydockerfile /frontend/pydockerfile
 
 # final image
 FROM scratch
@@ -20,12 +27,8 @@ LABEL org.opencontainers.image.url="https://gitlab.com/cmdjulian/pydockerfile" \
       org.opencontainers.image.documentation="https://gitlab.com/cmdjulian/pydockerfile" \
       org.opencontainers.image.authors="cmdjulian" \
       org.opencontainers.image.licenses="MIT"
-COPY --link --from=builder /usr/share/zoneinfo/Europe/Berlin /usr/share/zoneinfo/Europe/Berlin
-COPY --link --from=builder /etc/passwd /etc/group /etc/
-COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+ENV TZ=Europe/Berlin SSL_CERT_DIR=/etc/ssl/certs PATH=/frontend
 USER 65534:65534
-ENV TZ=Europe/Berlin SSL_CERT_DIR=/etc/ssl/certs PATH=/app
-WORKDIR /app
-COPY --link --from=builder --chown=65534:65534 /app/pydockerfile .
+COPY --link --from=squash / /
 
-ENTRYPOINT ["/app/pydockerfile"]
+ENTRYPOINT ["/frontend/pydockerfile"]
