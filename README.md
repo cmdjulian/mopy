@@ -97,3 +97,4 @@ $ docker run --rm example:latest
 ## Credits
 - https://earthly.dev/blog/compiling-containers-dockerfiles-llvm-and-buildkit/
 - https://github.com/moby/buildkit/blob/master/docs/merge%2Bdiff.md
+- https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md

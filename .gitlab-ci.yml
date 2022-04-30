@@ -12,9 +12,7 @@ sast:
 
 docker:
   stage: docker
-  image:
-    name: moby/buildkit:v0.10.2
-    entrypoint: [ "sh", "-c" ]
+  image: moby/buildkit:v0.10.2
   rules: [ { if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule" } ]
   needs: [ ]
   dependencies: [ ]
