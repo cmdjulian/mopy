@@ -12,37 +12,38 @@ sast:
 
 docker:
   stage: docker
-  image: jdrouet/docker-with-buildx:0.8.2
+  image:
+    name: moby/buildkit:v0.10.2-rootless
+    entrypoint: [ "sh", "-c" ]
   rules: [ { if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule" } ]
   needs: [ ]
   dependencies: [ ]
-  services:
-    - name: docker:20-dind
-      command: [ --experimental ]
   variables:
-    DOCKER_DRIVER: overlay2
-    BUILDX_VERSION: v0.8.2
-    BUILDX_ARCH: linux-amd64
-    DOCKER_BUILDKIT: "1"
-    DOCKER_CONTENT_TRUST: "1"
+    GITLAB_RELEASE: $CI_REGISTRY_IMAGE:v1
+    GITLAB_LATEST: $CI_REGISTRY_IMAGE:latest
+    DOCKER_HUB_AUTH_URL: https://index.docker.io/v1/
+    DOCKER_HUB_RELEASE: cmdjulian/pydockerfile:v1
+    DOCKER_HUB_LATEST: cmdjulian/pydockerfile:latest
+    PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
+    BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
-    - mkdir -p $HOME/.docker
-    - "echo -e '{\n  \"experimental\": \"enabled\"\n}' | tee $HOME/.docker/config.json"
-    - docker version
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
-    - echo "$DOCKER_HUB_PASSWORD" | docker login --username $DOCKER_HUB_USER --password-stdin
-    - docker buildx create --driver=docker-container --name=buildkit-builder --use
+    - apk add --no-cache jq moreutils
+    - mkdir -p ~/.docker
+    # gitlab registry login
+    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
+      > ~/.docker/config.json
+    # docker hub login
+    - >-
+      cat ~/.docker/config.json |
+      jq ".auths += {\"$DOCKER_HUB_AUTH_URL\": {
+      auth: \"$(echo -n "$DOCKER_HUB_USER:$DOCKER_HUB_PASSWORD" | base64)\"
+      }}" | sponge ~/.docker/config.json
   script: >-
-    docker buildx build
-    --platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-    --rm
-    --cache-to type=inline
-    --cache-from cmdjulian/pydockerfile:v1
-    --build-arg BUILDKIT_MULTI_PLATFORM=true
-    --build-arg BUILDKIT_SYNTAX=docker/dockerfile:1.4
-    --tag $CI_REGISTRY_IMAGE:v1
-    --tag $CI_REGISTRY_IMAGE:latest
-    --tag cmdjulian/pydockerfile:v1
-    --tag cmdjulian/pydockerfile:latest
-    --push
-    .
+    buildctl-daemonless.sh build
+    --frontend=dockerfile.v0
+    --local context=.
+    --local dockerfile=.
+    --export-cache type=inline
+    --import-cache type=registry,ref=$DOCKER_HUB_LATEST
+    --opt platform="$PLATFORMS"
+    --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",push=true
