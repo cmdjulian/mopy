@@ -27,17 +27,12 @@ docker:
     PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
     BUILDKITD_FLAGS: --oci-worker-no-process-sandbox
   before_script:
-    - apk add --no-cache jq moreutils
     - mkdir -p ~/.docker
-    # gitlab registry login
-    - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"}}}"
-      > ~/.docker/config.json
-    # docker hub login
-    - >-
-      cat ~/.docker/config.json |
-      jq ".auths += {\"$DOCKER_HUB_AUTH_URL\": {
-      auth: \"$(echo -n "$DOCKER_HUB_USER:$DOCKER_HUB_PASSWORD" | base64)\"
-      }}" | sponge ~/.docker/config.json
+    # gitlab registry and docker hub login
+    - echo "{\"auths\":{
+      \"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"},
+      \"$DOCKER_HUB_AUTH_URL\":{\"auth\":\"$(echo -n ${DOCKER_HUB_USER}:${DOCKER_HUB_PASSWORD} | base64)\"}
+      }}" > ~/.docker/config.json
   script: >-
     buildctl-daemonless.sh build
     --frontend=dockerfile.v0
