@@ -42,3 +42,4 @@ docker:
     --import-cache type=registry,ref=$DOCKER_HUB_LATEST
     --opt platform="$PLATFORMS"
     --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",push=true
+  tags: [ docker ]
