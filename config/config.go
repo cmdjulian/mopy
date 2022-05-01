@@ -3,8 +3,8 @@ package config
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/utils"
-	"gopkg.in/yaml.v2"
+	"gitlab.com/cmdjulian/pydockerfile/utils"
+	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"
 	"regexp"

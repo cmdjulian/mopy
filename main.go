@@ -9,8 +9,8 @@ import (
 	"github.com/moby/buildkit/frontend/gateway/grpcclient"
 	"github.com/moby/buildkit/util/appcontext"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/config"
-	pydocker "gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/llb"
+	"gitlab.com/cmdjulian/pydockerfile/config"
+	pydocker "gitlab.com/cmdjulian/pydockerfile/llb"
 	"io"
 	"os"
 )

@@ -2,8 +2,8 @@ package llb
 
 import (
 	"fmt"
-	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/config"
-	"gitlab.com/cmdjulian/buildkit-frontend-for-pythonv3/utils"
+	"gitlab.com/cmdjulian/pydockerfile/config"
+	"gitlab.com/cmdjulian/pydockerfile/utils"
 	"runtime"
 	"strings"
 )
@@ -110,8 +110,9 @@ func installLocalDeps(c *config.Config) string {
 			s = utils.After(s, "/") + "/"
 			target := "/tmp/" + s
 			line += fmt.Sprintf("COPY %s %s\n", source, target)
-			line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, target)
-			//line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s pip install %s", pipCacheMount, source, target, target)
+			line += fmt.Sprintf("\nRUN %s pip install %s", pipCacheMount, target)
+			// should be supported with buildkit but isn't
+			// line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s,rw pip install %s", pipCacheMount, source, target, target)
 		}
 	}
 
