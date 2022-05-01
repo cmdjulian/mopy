@@ -98,22 +98,20 @@ func installSshDeps(c *config.Config) string {
 }
 
 func installLocalDeps(c *config.Config) string {
-	line := ""
-	deps := c.LocalDependencies()
+	line := "\n"
 
-	if len(deps) > 0 {
-		for _, s := range deps {
-			if strings.HasSuffix(s, "/requirements.txt") {
-				target := "/tmp/requirements.txt"
-				line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", pipCacheMount, s, target, target)
-			} else {
-				s = strings.TrimSuffix(s, "/")
-				source := s + "/"
-				s = utils.After(s, "/") + "/"
-				target := "/tmp/" + s
-				line += fmt.Sprintf("COPY %s %s\n", source, target)
-				line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, target)
-			}
+	for _, s := range c.LocalDependencies() {
+		if strings.HasSuffix(s, "/requirements.txt") {
+			target := "/tmp/requirements.txt"
+			line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", pipCacheMount, s, target, target)
+		} else {
+			s = strings.TrimSuffix(s, "/")
+			source := strings.TrimPrefix(s, "./")
+			s = utils.After(s, "/") + "/"
+			target := "/tmp/" + s
+			line += fmt.Sprintf("COPY %s %s\n", source, target)
+			line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, target)
+			//line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s pip install %s", pipCacheMount, source, target, target)
 		}
 	}
 
@@ -146,11 +144,9 @@ func determineFinalBaseImage(c *config.Config) string {
 func runStage(c *config.Config) string {
 	line := "\n"
 	line += determineFinalBaseImage(c)
-
-	if len(c.Envs) > 0 {
-		line += env(c.Envs)
-	}
-
+	line += labels(c.PythonVersion)
+	c.Envs["PYTHONUNBUFFERED"] = "1"
+	line += env(c.Envs)
 	if len(c.PipDependencies) > 0 {
 		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
 	}
@@ -158,8 +154,6 @@ func runStage(c *config.Config) string {
 	if c.Project != "" {
 		line += project(c)
 	}
-
-	line += labels(c.PythonVersion)
 
 	return line
 }

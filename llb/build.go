@@ -36,6 +36,7 @@ func Build(ctx context.Context, c client.Client) (*client.Result, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to get PyDockerfile")
 	}
+
 	dockerfile := PyDocker2LLB(pyDockerConfig)
 	buildState, imgConfig, _, _ := dockerfile2llb.Dockerfile2LLB(ctx, []byte(dockerfile), dockerfile2llb.ConvertOpt{})
 
@@ -90,12 +91,11 @@ func GetPyDockerConfig(ctx context.Context, c client.Client) (*config.Config, er
 		return nil, errors.Wrapf(err, "failed to marshal local source")
 	}
 
-	var pyDockerfileYaml []byte
 	res, err := c.Solve(ctx, client.SolveRequest{
 		Definition: def.ToPB(),
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to resolve dockerfile")
+		return nil, errors.Wrapf(err, "failed to create solve request")
 	}
 
 	ref, err := res.SingleRef()
@@ -103,6 +103,7 @@ func GetPyDockerConfig(ctx context.Context, c client.Client) (*config.Config, er
 		return nil, err
 	}
 
+	var pyDockerfileYaml []byte
 	pyDockerfileYaml, err = ref.ReadFile(ctx, client.ReadRequest{
 		Filename: filename,
 	})
