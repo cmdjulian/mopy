@@ -15,7 +15,7 @@ var defaultEnvs = map[string]string{
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
-	"PYTHONPYCACHEPREFIX":           "$HOME/.pycache",
+	"PYTHONPYCACHEPREFIX":           "\"$HOME/.pycache\"",
 }
 
 var defaulLabels = map[string]string{
@@ -103,14 +103,14 @@ func installLocalDeps(c *config.Config) string {
 	for _, s := range c.LocalDependencies() {
 		if strings.HasSuffix(s, "/requirements.txt") {
 			target := "/tmp/requirements.txt"
-			line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s", pipCacheMount, s, target, target)
+			line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s\n", pipCacheMount, s, target, target)
 		} else {
 			s = strings.TrimSuffix(s, "/")
 			source := strings.TrimPrefix(s, "./")
 			s = utils.After(s, "/") + "/"
 			target := "/tmp/" + s
 			line += fmt.Sprintf("COPY %s %s\n", source, target)
-			line += fmt.Sprintf("\nRUN %s pip install %s", pipCacheMount, target)
+			line += fmt.Sprintf("RUN %s pip install %s\n", pipCacheMount, target)
 			// should be supported with buildkit but isn't
 			// line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s,rw pip install %s", pipCacheMount, source, target, target)
 		}
@@ -146,8 +146,8 @@ func runStage(c *config.Config) string {
 	line := "\n"
 	line += determineFinalBaseImage(c)
 	line += labels(c.PythonVersion)
-	c.Envs["PYTHONUNBUFFERED"] = "1"
-	line += env(c.Envs)
+
+	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
 	if len(c.PipDependencies) > 0 {
 		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
 	}

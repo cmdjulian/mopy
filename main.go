@@ -17,23 +17,45 @@ import (
 
 var filename string
 var graph bool
+var printDockerfile bool
+var issueLlb bool
 
 func main() {
 	flag.BoolVar(&graph, "graph", false, "output a graph and exit")
+	flag.BoolVar(&printDockerfile, "printDockerfile", false, "output created dockerfile")
+	flag.BoolVar(&issueLlb, "llb", true, "contact grpc docker server")
 	flag.StringVar(&filename, "filename", "PyDockerfile.yaml", "the PyDockerfile to build from")
 	flag.Parse()
+
+	if printDockerfile {
+		if err := printDockerfileContent(filename); err != nil {
+			os.Exit(1)
+		}
+	}
 
 	if graph {
 		if err := printLLB(filename, os.Stdout); err != nil {
 			os.Exit(1)
 		}
-		os.Exit(0)
 	}
 
-	if err := grpcclient.RunFromEnvironment(appcontext.Context(), pydocker.Build); err != nil {
-		panic(err)
+	if issueLlb {
+		if err := grpcclient.RunFromEnvironment(appcontext.Context(), pydocker.Build); err != nil {
+			panic(err)
+		}
 	}
 
+}
+
+func printDockerfileContent(filename string) error {
+	c, err := config.NewFromFilename(filename)
+	if err != nil {
+		return errors.Wrap(err, "opening PyDockerfile")
+	}
+	dockerfile := pydocker.PyDocker2LLB(c)
+	fmt.Println(dockerfile)
+
+	return nil
 }
 
 func printLLB(filename string, out io.Writer) error {
@@ -42,7 +64,6 @@ func printLLB(filename string, out io.Writer) error {
 		return errors.Wrap(err, "opening PyDockerfile")
 	}
 	dockerfile := pydocker.PyDocker2LLB(c)
-	fmt.Println(dockerfile)
 	st, _, _, _ := dockerfile2llb.Dockerfile2LLB(context.TODO(), []byte(dockerfile), dockerfile2llb.ConvertOpt{})
 	dt, err := st.Marshal(context.Background())
 	if err != nil {
