@@ -16,6 +16,7 @@ var defaultEnvs = map[string]string{
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
 	"PYTHONPYCACHEPREFIX":           "\"$HOME/.pycache\"",
+	"GIT_SSH_COMMAND":               "\"ssh -o StrictHostKeyChecking=no\"",
 }
 
 var defaulLabels = map[string]string{
@@ -90,7 +91,6 @@ func installSshDeps(c *config.Config) string {
 
 	if len(deps) > 0 {
 		depString := strings.Join(deps, " ")
-		line += "ENV GIT_SSH_COMMAND=\"ssh -o StrictHostKeyChecking=no\"\n"
 		line += fmt.Sprintf("RUN %s --mount=type=ssh,required=true pip install %s", pipCacheMount, depString)
 	}
 
@@ -112,7 +112,7 @@ func installLocalDeps(c *config.Config) string {
 			line += fmt.Sprintf("COPY %s %s\n", source, target)
 			line += fmt.Sprintf("RUN %s pip install %s\n", pipCacheMount, target)
 			// should be supported with buildkit but isn't
-			// line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s,rw pip install %s", pipCacheMount, source, target, target)
+			// line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s pip install %s\n", pipCacheMount, source, target, target)
 		}
 	}
 
@@ -122,10 +122,27 @@ func installLocalDeps(c *config.Config) string {
 func cleanCacheDataFromInstalled(c *config.Config) string {
 	line := "\n"
 	if len(c.PipDependencies) > 0 {
-		line += "RUN find ~/.local/lib/python3.*/ -name 'tests' -exec rm -r '{}' + && "
-		line += "find ~/.local/lib/python3.*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\; && "
-		line += "find ~ -type f -name '*.pyc' -delete && "
-		line += "find ~ -type d -name '__pycache__' -delete\n"
+		line += "RUN find /root/.local/lib/python*/ -name 'tests' -exec rm -r '{}' + && "
+		line += "find /root/.local/lib/python*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\; && "
+		line += "find /root/.local/lib/python*/ -type f -name '*.pyc' -delete && "
+		line += "find /root/.local/lib/python*/ -type d -name '__pycache__' -delete\n"
+	}
+
+	return line
+}
+
+func runStage(c *config.Config) string {
+	line := "\n"
+	line += determineFinalBaseImage(c)
+	line += labels(c.PythonVersion)
+
+	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
+	if len(c.PipDependencies) > 0 {
+		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
+	}
+
+	if c.Project != "" {
+		line += project(c)
 	}
 
 	return line
@@ -142,18 +159,14 @@ func determineFinalBaseImage(c *config.Config) string {
 	return fallback(c)
 }
 
-func runStage(c *config.Config) string {
-	line := "\n"
-	line += determineFinalBaseImage(c)
-	line += labels(c.PythonVersion)
-
-	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
-	if len(c.PipDependencies) > 0 {
-		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
+func labels(pythonVersion string) string {
+	line := "\nLABEL"
+	labels := map[string]string{
+		"pydockerfile.python.version": pythonVersion,
 	}
 
-	if c.Project != "" {
-		line += project(c)
+	for key, value := range utils.Union(defaulLabels, labels) {
+		line += fmt.Sprintf(" %s=\"%s\"", key, value)
 	}
 
 	return line
@@ -185,19 +198,6 @@ func project(c *config.Config) string {
 	} else {
 		line += fmt.Sprintf("WORKDIR %s\n", source)
 		line += "CMD [ \"main.py\" ]"
-	}
-
-	return line
-}
-
-func labels(pythonVersion string) string {
-	line := "\nLABEL"
-	labels := map[string]string{
-		"pydockerfile.python.version": pythonVersion,
-	}
-
-	for key, value := range utils.Union(defaulLabels, labels) {
-		line += fmt.Sprintf(" %s=\"%s\"", key, value)
 	}
 
 	return line

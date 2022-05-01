@@ -22,7 +22,7 @@ var issueLlb bool
 
 func main() {
 	flag.BoolVar(&graph, "graph", false, "output a graph and exit")
-	flag.BoolVar(&printDockerfile, "printDockerfile", false, "output created dockerfile")
+	flag.BoolVar(&printDockerfile, "print", false, "output created dockerfile")
 	flag.BoolVar(&issueLlb, "llb", true, "contact grpc docker server")
 	flag.StringVar(&filename, "filename", "PyDockerfile.yaml", "the PyDockerfile to build from")
 	flag.Parse()

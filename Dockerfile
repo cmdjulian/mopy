@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.4
 # compile go app
-FROM --platform=$BUILDPLATFORM golang:1.16-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.18-alpine AS builder
 ENV CGO_ENABLED=0
 WORKDIR /build
 RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
