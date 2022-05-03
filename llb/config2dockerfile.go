@@ -36,16 +36,87 @@ func buildStage(c *config.Config) string {
 	dockerfile := from(c)
 	dockerfile += apt(c)
 	dockerfile += env(utils.Union(defaultEnvs, c.Envs))
-	dockerfile += installSshDeps(c)
-	dockerfile += installExternalDeps(c)
-	dockerfile += installLocalDeps(c)
-	dockerfile += cleanCacheDataFromInstalled(c)
+	dockerfile += installDeps(c)
+	dockerfile += clearCachedDataFromInstall(c)
 
 	return dockerfile
 }
 
+// Determine flags like mount, ssh and cache
+// transform local deps into relative paths, requirements.txt and ssh
+// install all at one (local, requirements.txt, ssh, http and pypi)
+func installDeps(c *config.Config) string {
+	if len(c.PipDependencies) == 0 {
+		return ""
+	}
+
+	flags := flags(c)
+	args := args(c)
+
+	COPY := ""
+	RUN := fmt.Sprintf("\nRUN %s pip install %s", flags, args)
+
+	for i, s := range c.LocalDependencies() {
+		if !strings.HasSuffix(s, "/requirements.txt") {
+			s = strings.TrimSuffix(s, "/")
+			source := strings.TrimPrefix(s, "./")
+			s = utils.After(s, "/") + "/"
+			target := fmt.Sprintf("/tmp/%d%s", i, s)
+			// should be supported with buildkit but isn't
+			COPY += fmt.Sprintf("\nCOPY %s %s", source, target)
+		}
+	}
+
+	return COPY + RUN
+}
+
+func args(c *config.Config) string {
+	args := ""
+
+	for i, s := range c.LocalDependencies() {
+		if strings.HasSuffix(s, "/requirements.txt") {
+			target := fmt.Sprintf("/tmp/%drequirements.txt", i)
+			args += fmt.Sprintf("-r %s ", target)
+		} else {
+			s = strings.TrimSuffix(s, "/")
+			s = utils.After(s, "/") + "/"
+			target := fmt.Sprintf("/tmp/%d%s", i, s)
+			args += fmt.Sprintf("%s ", target)
+		}
+	}
+
+	deps := append(append(c.PyPiDependencies(), c.HttpDependencies()...), c.SshDependencies()...)
+	if len(deps) > 0 {
+		depString := strings.Join(deps, " ")
+		args += fmt.Sprintf("%s ", depString)
+	}
+
+	return args
+}
+
+func flags(c *config.Config) string {
+	flags := pipCacheMount
+
+	if len(c.SshDependencies()) > 0 {
+		flags += " --mount=type=ssh,required=true"
+	}
+
+	for i, s := range c.LocalDependencies() {
+		if strings.HasSuffix(s, "/requirements.txt") {
+			target := fmt.Sprintf("/tmp/%drequirements.txt", i)
+			flags += fmt.Sprintf(" --mount=type=bind,source=%s,target=%s", s, target)
+		}
+	}
+
+	return flags
+}
+
 func from(c *config.Config) string {
-	return fmt.Sprintf("FROM python:%s AS builder\n", c.PythonVersion)
+	line := fmt.Sprintf("FROM python:%s AS builder\n", c.PythonVersion)
+	line += "RUN mkdir /build\n"
+	line += "WORKDIR /build\n"
+
+	return line
 }
 
 func apt(c *config.Config) string {
@@ -119,7 +190,7 @@ func installLocalDeps(c *config.Config) string {
 	return line
 }
 
-func cleanCacheDataFromInstalled(c *config.Config) string {
+func clearCachedDataFromInstall(c *config.Config) string {
 	line := "\n"
 	if len(c.PipDependencies) > 0 {
 		line += "RUN find /root/.local/lib/python*/ -name 'tests' -exec rm -r '{}' + && "
