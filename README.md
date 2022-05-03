@@ -94,7 +94,33 @@ The build image can be run like any other container:
 $ docker run --rm example:latest
 ```
 
+## Arguments
+
+The following arguments are supported running the frontend:
+
+| name     |             description              |    type |           default |
+|----------|:------------------------------------:|--------:|------------------:|
+| graph    |     output created llb to stdin      | boolean |             false |
+| print    |     print equivalent Dockerfile      | boolean |             false |
+| llb      | connect to buildkit and run frontend | boolean |              true |
+| filename |         path to PyDockerfile         |  string | PyDockerfile.yaml |
+
+For instance to show the created equivalent Dockerfile use the
+command `go run main.go -llb=false -print=true -filename=example/full/PyDockerfile.yaml`.
+
+You can use the created llb and pipe it directly into buildkit for testing purposes: 
+```bash
+docker run --rm --privileged -d --name buildkit moby/buildkit
+export BUILDKIT_HOST=docker-container://buildkit
+go run main.go -graph=true -llb=false -filename=example/full/PyDockerfile.yaml | \
+buildctl build \
+--local context=example/full/ \
+--ssh default \
+--output type=docker,name=full:latest | docker load
+```
+
 ## Credits
+
 - https://earthly.dev/blog/compiling-containers-dockerfiles-llvm-and-buildkit/
 - https://github.com/moby/buildkit/blob/master/docs/merge%2Bdiff.md
 - https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md
