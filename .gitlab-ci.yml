@@ -1,10 +1,21 @@
 # https://gitlab.com/cmdjulian/mopy/-/ci/lint
 
 include:
+  # Gitlab Templates for Static Security and Secretes detection
+  - template: Security/Secret-Detection.gitlab-ci.yml
+  # Gitlab static scanning
   - template: Security/SAST.gitlab-ci.yml
+
 
 stages: [ test, docker ]
 
+
+secret_detection:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 sast:
   stage: test
