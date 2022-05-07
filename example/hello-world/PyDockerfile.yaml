@@ -1,4 +1,0 @@
-#syntax=cmdjulian/pydockerfile:v1
-
-python: 3.9
-project: main.py

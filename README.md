@@ -1,23 +1,21 @@
-# Buildkit Frontend for Python
+# `mopy` - a Buildkit Frontend for Python
 
-🐳 Pydockerfile is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
+🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
 overhead or just create an image containing the required pip dependencies.  
 No need to know or learn Docker!
 
 ## Installation as cmd
 
 ```bash
-$ go get -u gitlan.com/cmdjulian/pydockerfile
+$ go get -u gitlan.com/cmdjulian/mopy
 ```
 
 ## Usage
 
-### Pydockerfile config file
-
-create a Pydockerfile.yaml:
+create a `Mopyfile.yaml`:
 
 ```yaml
-#syntax=cmdjulian/pydockerfile
+#syntax=cmdjulian/mopy
 
 apiVersion: v1
 python: 3.9.2
@@ -56,12 +54,12 @@ This project folder has to contain a `main.py` file. Also, a path to a single py
 the `project` field doesn't set an entrypoint and only creates an image consisting of the specified `python` version and
 the dependencies if specified.
 
-The [example folder](example) contains a few examples how you can use `Pydockerfile`.
+The [example folder](example) contains a few examples how you can use `mopy`.
 
-### Build Pydockerfile using docker build
+### Build `Mopyfile` using docker build
 
-```
-$ DOCKER_BUILDKIT=1 docker build --ssh default -t example:latest -f PyDockerfile.yaml .
+```bash
+DOCKER_BUILDKIT=1 docker build --ssh default -t example:latest -f Mopyfile.yaml .
 ```
 
 If at least one ssh dependency is present in the deps list, pay attention to add the `--ssh default`
@@ -71,14 +69,12 @@ The resulting image is build as a best practice docker image as a multistage bui
 uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
 non-root and only includes the minimal required runtime dependencies.
 
-### Build Pydockerfile with builtctl
-
-using as buildkit frontend.
+### Build `Mopyfile` with builtctl
 
 ```bash
 buildctl build \
     --frontend=gateway.v0 \
-    --opt source=cmdjulian/pydockerfile \
+    --opt source=cmdjulian/mopy \
     --ssh default \
     --local context=. \
     --local dockerfile=. \
@@ -86,9 +82,9 @@ buildctl build \
 | docker load
 ```
 
-## Run container
+## Run a container from the built image
 
-The build image can be run like any other container:
+The built image can be run like any other container:
 
 ```bash
 $ docker run --rm example:latest
@@ -98,21 +94,22 @@ $ docker run --rm example:latest
 
 The following arguments are supported running the frontend:
 
-| name     |             description              |    type |           default |
-|----------|:------------------------------------:|--------:|------------------:|
-| graph    |     output created llb to stdin      | boolean |             false |
-| print    |     print equivalent Dockerfile      | boolean |             false |
-| llb      | connect to buildkit and run frontend | boolean |              true |
-| filename |         path to PyDockerfile         |  string | PyDockerfile.yaml |
+| name     |             description              |    type |       default |
+|----------|:------------------------------------:|--------:|--------------:|
+| graph    |     output created llb to stdin      | boolean |         false |
+| print    |     print equivalent Dockerfile      | boolean |         false |
+| llb      | connect to buildkit and run frontend | boolean |          true |
+| filename |           path to Mopyfile           |  string | Mopyfile.yaml |
 
 For instance to show the created equivalent Dockerfile use the
-command `go run main.go -llb=false -print=true -filename=example/full/PyDockerfile.yaml`.
+command `go run main.go -llb=false -print=true -filename=example/full/Mopyfile.yaml`.
 
-You can use the created llb and pipe it directly into buildkit for testing purposes: 
+You can use the created llb and pipe it directly into buildkit for testing purposes:
+
 ```bash
 docker run --rm --privileged -d --name buildkit moby/buildkit
 export BUILDKIT_HOST=docker-container://buildkit
-go run main.go -graph=true -llb=false -filename=example/full/PyDockerfile.yaml | \
+go run main.go -graph=true -llb=false -filename=example/full/Mopyfile.yaml | \
 buildctl build \
 --local context=example/full/ \
 --ssh default \

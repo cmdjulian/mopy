@@ -9,7 +9,7 @@ import (
 	"github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/gateway/client"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/pydockerfile/config"
+	"gitlab.com/cmdjulian/mopy/config"
 )
 
 const (
@@ -18,7 +18,7 @@ const (
 	keyTarget             = "target"
 	keyFilename           = "filename"
 	keyCacheFrom          = "cache-from"
-	defaultDockerfileName = "PyDockerfile.yaml"
+	defaultDockerfileName = "Mopyfile.yaml"
 	dockerignoreFilename  = ".dockerignore"
 	buildArgPrefix        = "build-arg:"
 	labelPrefix           = "label:"
@@ -34,10 +34,10 @@ const (
 func Build(ctx context.Context, c client.Client) (*client.Result, error) {
 	pyDockerConfig, err := GetPyDockerConfig(ctx, c)
 	if err != nil {
-		return nil, errors.Wrap(err, "failed to get PyDockerfile")
+		return nil, errors.Wrap(err, "failed to get Mopyfile")
 	}
 
-	dockerfile := PyDocker2LLB(pyDockerConfig)
+	dockerfile := Mopyfile2LLB(pyDockerConfig)
 	buildState, imgConfig, _, _ := dockerfile2llb.Dockerfile2LLB(ctx, []byte(dockerfile), dockerfile2llb.ConvertOpt{})
 
 	def, err := buildState.Marshal(context.TODO())
@@ -74,7 +74,7 @@ func GetPyDockerConfig(ctx context.Context, c client.Client) (*config.Config, er
 	}
 
 	name := "load definition"
-	if filename != "PyDockerfile" {
+	if filename != "Mopyfile" {
 		name += " from " + filename
 	}
 
@@ -103,15 +103,15 @@ func GetPyDockerConfig(ctx context.Context, c client.Client) (*config.Config, er
 		return nil, err
 	}
 
-	var pyDockerfileYaml []byte
-	pyDockerfileYaml, err = ref.ReadFile(ctx, client.ReadRequest{
+	var mopyfileYaml []byte
+	mopyfileYaml, err = ref.ReadFile(ctx, client.ReadRequest{
 		Filename: filename,
 	})
 	if err != nil {
-		return nil, errors.Wrapf(err, "failed to read PyDockerfile")
+		return nil, errors.Wrapf(err, "failed to read Mopyfile")
 	}
 
-	cfg, err := config.NewFromBytes(pyDockerfileYaml)
+	cfg, err := config.NewFromBytes(mopyfileYaml)
 	if err != nil {
 		return nil, errors.Wrap(err, "error on getting parsing config")
 	}

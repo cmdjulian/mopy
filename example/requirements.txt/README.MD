@@ -1,3 +1,3 @@
 ```bash
-docker build -t env:latest -f PyDockerfile.yaml .
+docker build -t env:latest -f Mopyfile.yaml .
 ```

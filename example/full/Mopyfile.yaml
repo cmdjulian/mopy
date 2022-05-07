@@ -1,4 +1,4 @@
-#syntax=cmdjulian/pydockerfile:v1
+#syntax=cmdjulian/mopy:v1
 
 apiVersion: v1
 python: 3.9.2

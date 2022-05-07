@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/pydockerfile/utils"
+	"gitlab.com/cmdjulian/mopy/utils"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"

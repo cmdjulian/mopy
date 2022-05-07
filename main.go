@@ -9,8 +9,8 @@ import (
 	"github.com/moby/buildkit/frontend/gateway/grpcclient"
 	"github.com/moby/buildkit/util/appcontext"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/pydockerfile/config"
-	pydocker "gitlab.com/cmdjulian/pydockerfile/llb"
+	"gitlab.com/cmdjulian/mopy/config"
+	mopy "gitlab.com/cmdjulian/mopy/llb"
 	"io"
 	"os"
 )
@@ -24,7 +24,7 @@ func main() {
 	flag.BoolVar(&graph, "graph", false, "output a graph and exit")
 	flag.BoolVar(&printDockerfile, "print", false, "output created dockerfile")
 	flag.BoolVar(&issueLlb, "llb", true, "contact grpc docker server")
-	flag.StringVar(&filename, "filename", "PyDockerfile.yaml", "the PyDockerfile to build from")
+	flag.StringVar(&filename, "filename", "Mopyfile.yaml", "the Mopyfile to build from")
 	flag.Parse()
 
 	if printDockerfile {
@@ -40,7 +40,7 @@ func main() {
 	}
 
 	if issueLlb {
-		if err := grpcclient.RunFromEnvironment(appcontext.Context(), pydocker.Build); err != nil {
+		if err := grpcclient.RunFromEnvironment(appcontext.Context(), mopy.Build); err != nil {
 			panic(err)
 		}
 	}
@@ -50,9 +50,9 @@ func main() {
 func printDockerfileContent(filename string) error {
 	c, err := config.NewFromFilename(filename)
 	if err != nil {
-		return errors.Wrap(err, "opening PyDockerfile")
+		return errors.Wrap(err, "opening Mopyfile")
 	}
-	dockerfile := pydocker.PyDocker2LLB(c)
+	dockerfile := mopy.Mopyfile2LLB(c)
 	fmt.Println(dockerfile)
 
 	return nil
@@ -61,9 +61,9 @@ func printDockerfileContent(filename string) error {
 func printLLB(filename string, out io.Writer) error {
 	c, err := config.NewFromFilename(filename)
 	if err != nil {
-		return errors.Wrap(err, "opening PyDockerfile")
+		return errors.Wrap(err, "opening Mopyfile")
 	}
-	dockerfile := pydocker.PyDocker2LLB(c)
+	dockerfile := mopy.Mopyfile2LLB(c)
 	st, _, _, _ := dockerfile2llb.Dockerfile2LLB(context.TODO(), []byte(dockerfile), dockerfile2llb.ConvertOpt{})
 	dt, err := st.Marshal(context.Background())
 	if err != nil {
