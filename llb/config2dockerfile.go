@@ -144,52 +144,6 @@ func env(envs map[string]string) string {
 	return line
 }
 
-func installExternalDeps(c *config.Config) string {
-	line := "\n"
-	deps := append(c.PyPiDependencies(), c.HttpDependencies()...)
-
-	if len(deps) > 0 {
-		depString := strings.Join(deps, " ")
-		line += fmt.Sprintf("RUN %s pip install %s", pipCacheMount, depString)
-	}
-
-	return line
-}
-
-func installSshDeps(c *config.Config) string {
-	line := "\n"
-	deps := c.SshDependencies()
-
-	if len(deps) > 0 {
-		depString := strings.Join(deps, " ")
-		line += fmt.Sprintf("RUN %s --mount=type=ssh,required=true pip install %s", pipCacheMount, depString)
-	}
-
-	return line
-}
-
-func installLocalDeps(c *config.Config) string {
-	line := "\n"
-
-	for _, s := range c.LocalDependencies() {
-		if strings.HasSuffix(s, "/requirements.txt") {
-			target := "/tmp/requirements.txt"
-			line += fmt.Sprintf("\nRUN %s --mount=type=bind,source=%s,target=%s pip install -r %s\n", pipCacheMount, s, target, target)
-		} else {
-			s = strings.TrimSuffix(s, "/")
-			source := strings.TrimPrefix(s, "./")
-			s = utils.After(s, "/") + "/"
-			target := "/tmp/" + s
-			line += fmt.Sprintf("COPY %s %s\n", source, target)
-			line += fmt.Sprintf("RUN %s pip install %s\n", pipCacheMount, target)
-			// should be supported with buildkit but isn't
-			// line += fmt.Sprintf("RUN %s --mount=type=bind,source=%s,target=%s pip install %s\n", pipCacheMount, source, target, target)
-		}
-	}
-
-	return line
-}
-
 func clearCachedDataFromInstall(c *config.Config) string {
 	line := "\n"
 	if len(c.PipDependencies) > 0 {
