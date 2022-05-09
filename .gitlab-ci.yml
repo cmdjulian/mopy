@@ -19,8 +19,11 @@ secret_detection:
 
 sast:
   stage: test
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "schedule"
+      when: never
 
-docker:
+container-image:
   stage: docker
   image:
     name: moby/buildkit:v0.10.2
