@@ -6,7 +6,7 @@ include:
   # Gitlab static scanning
   - template: Security/SAST.gitlab-ci.yml
   # dependabot
-  - remote: 'https://gitlab.com/dependabot-gitlab/dependabot-standalone/-/raw/master/.gitlab-ci.yml'
+  - local: /.gitlab/.gitlab-ci.yaml
 
 
 stages: [ test, docker ]
@@ -19,7 +19,8 @@ secret_detection:
 
 sast:
   stage: test
-
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
 
 docker:
   stage: docker
