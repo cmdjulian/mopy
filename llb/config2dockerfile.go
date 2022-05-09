@@ -63,7 +63,7 @@ func installDeps(c *config.Config) string {
 			s = utils.After(s, "/") + "/"
 			target := fmt.Sprintf("/tmp/%d%s", i, s)
 			// should be supported with buildkit but isn't
-			COPY += fmt.Sprintf("\nCOPY %s %s", source, target)
+			COPY += fmt.Sprintf("\nCOPY -link %s %s", source, target)
 		}
 	}
 
