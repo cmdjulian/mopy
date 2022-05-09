@@ -6,7 +6,7 @@ include:
   # Gitlab static scanning
   - template: Security/SAST.gitlab-ci.yml
   # dependabot
-  - local: '/.gitlab/.gitlab-ci.yaml'
+  - remote: 'https://gitlab.com/dependabot-gitlab/dependabot-standalone/-/raw/master/.gitlab-ci.yml'
 
 
 stages: [ test, docker ]
