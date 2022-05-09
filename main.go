@@ -24,7 +24,7 @@ func main() {
 	flag.BoolVar(&outputLLB, "llb", false, "print llb to stdout")
 	flag.BoolVar(&outputDockerfile, "dockerfile", false, "print equivalent Dockerfile to stdout")
 	flag.BoolVar(&buildkit, "buildkit", true, "establish connection to buildkit and issue build")
-	flag.StringVar(&filename, "f", "Mopyfile.yaml", "the Mopyfile to build from")
+	flag.StringVar(&filename, "filename", "Mopyfile.yaml", "the Mopyfile to build from")
 	flag.Parse()
 
 	if outputDockerfile {
