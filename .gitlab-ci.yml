@@ -19,8 +19,6 @@ secret_detection:
 
 sast:
   stage: test
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
 
 docker:
   stage: docker
@@ -54,3 +52,4 @@ docker:
     --import-cache type=registry,ref=$DOCKER_HUB_LATEST
     --opt platform="$PLATFORMS"
     --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",buildinfo-attrs=true,push=true
+  tags: [ "!secured" ]
