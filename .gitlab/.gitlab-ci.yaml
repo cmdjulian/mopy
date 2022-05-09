@@ -3,7 +3,6 @@
     name: docker.io/andrcuns/dependabot-gitlab:0.19.2
     entrypoint: [ "" ]
   variables:
-    GIT_STRATEGY: none
     RAILS_ENV: production
     SECRET_KEY_BASE: key
     PACKAGE_MANAGER: $CI_JOB_NAME
