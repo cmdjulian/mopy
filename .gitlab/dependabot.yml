@@ -7,5 +7,3 @@ updates:
   # Maintain dependencies for gomod
   - package-ecosystem: "gomod"
     directory: "/"
-    schedule:
-      interval: "daily"
