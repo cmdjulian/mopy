@@ -3,7 +3,7 @@ module gitlab.com/cmdjulian/mopy
 go 1.18
 
 require (
-	github.com/moby/buildkit v0.10.2
+	github.com/moby/buildkit v0.10.3
 	github.com/pkg/errors v0.9.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )
