@@ -15,14 +15,14 @@
     - bundle exec rake "dependabot:update[$PROJECT_PATH,$PACKAGE_MANAGER,$DIRECTORY]"
 
 gomod:
-  extends: .gitlab-gitlab
+  extends: .dependabot-gitlab
   rules:
     - if: $DEPENDENCY_UPDATES_DISABLED
       when: never
     - if: $CI_PIPELINE_SOURCE == "schedule"
 
 docker:
-  extends: .gitlab-gitlab
+  extends: .dependabot-gitlab
   rules:
     - if: $DEPENDENCY_UPDATES_DISABLED
       when: never
