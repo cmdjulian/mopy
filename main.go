@@ -16,38 +16,37 @@ import (
 )
 
 var filename string
-var graph bool
-var printDockerfile bool
-var issueLlb bool
+var outputLLB bool
+var outputDockerfile bool
+var buildkit bool
 
 func main() {
-	flag.BoolVar(&graph, "graph", false, "output a graph and exit")
-	flag.BoolVar(&printDockerfile, "print", false, "output created dockerfile")
-	flag.BoolVar(&issueLlb, "llb", true, "contact grpc docker server")
-	flag.StringVar(&filename, "filename", "Mopyfile.yaml", "the Mopyfile to build from")
+	flag.BoolVar(&outputLLB, "llb", false, "print llb to stdout")
+	flag.BoolVar(&outputDockerfile, "dockerfile", false, "print equivalent Dockerfile to stdout")
+	flag.BoolVar(&buildkit, "buildkit", true, "establish connection to buildkit and issue build")
+	flag.StringVar(&filename, "f", "Mopyfile.yaml", "the Mopyfile to build from")
 	flag.Parse()
 
-	if printDockerfile {
-		if err := printDockerfileContent(filename); err != nil {
+	if outputDockerfile {
+		if err := printDockerfile(filename); err != nil {
 			os.Exit(1)
 		}
 	}
 
-	if graph {
-		if err := printLLB(filename, os.Stdout); err != nil {
+	if outputLLB {
+		if err := printLlb(filename, os.Stdout); err != nil {
 			os.Exit(1)
 		}
 	}
 
-	if issueLlb {
+	if buildkit {
 		if err := grpcclient.RunFromEnvironment(appcontext.Context(), mopy.Build); err != nil {
 			panic(err)
 		}
 	}
-
 }
 
-func printDockerfileContent(filename string) error {
+func printDockerfile(filename string) error {
 	c, err := config.NewFromFilename(filename)
 	if err != nil {
 		return errors.Wrap(err, "opening Mopyfile")
@@ -58,7 +57,7 @@ func printDockerfileContent(filename string) error {
 	return nil
 }
 
-func printLLB(filename string, out io.Writer) error {
+func printLlb(filename string, out io.Writer) error {
 	c, err := config.NewFromFilename(filename)
 	if err != nil {
 		return errors.Wrap(err, "opening Mopyfile")

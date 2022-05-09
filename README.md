@@ -100,22 +100,22 @@ $ docker run --rm example:latest
 
 The following arguments are supported running the frontend:
 
-| name     |             description              |    type |       default |
-|----------|:------------------------------------:|--------:|--------------:|
-| graph    |     output created llb to stdin      | boolean |         false |
-| print    |     print equivalent Dockerfile      | boolean |         false |
-| llb      | connect to buildkit and run frontend | boolean |          true |
-| filename |           path to Mopyfile           |  string | Mopyfile.yaml |
+| name       |              description              |    type |       default |
+|------------|:-------------------------------------:|--------:|--------------:|
+| llb        |     output created llb to stdout      | boolean |         false |
+| dockerfile | print equivalent Dockerfile to stdout | boolean |         false |
+| buildkit   |  connect to buildkit and build image  | boolean |          true |
+| filename   |           path to Mopyfile            |  string | Mopyfile.yaml |
 
 For instance to show the created equivalent Dockerfile use the
-command `go run main.go -llb=false -print=true -filename=example/full/Mopyfile.yaml`.
+command `go run main.go -buildkit=false -dockerfile=true -filename=example/full/Mopyfile.yaml`.
 
 You can use the created llb and pipe it directly into buildkit for testing purposes:
 
 ```bash
 docker run --rm --privileged -d --name buildkit moby/buildkit
 export BUILDKIT_HOST=docker-container://buildkit
-go run main.go -graph=true -llb=false -filename=example/full/Mopyfile.yaml | \
+go run main.go -llb=true -buildkit=false -filename=example/full/Mopyfile.yaml | \
 buildctl build \
 --local context=example/full/ \
 --ssh default \
