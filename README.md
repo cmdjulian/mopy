@@ -69,6 +69,12 @@ The resulting image is build as a best practice docker image as a multistage bui
 uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
 non-root and only includes the minimal required runtime dependencies.
 
+### Build `Mopyfile` with nerdctl
+
+```bash
+nerdctl build --ssh default -t example:latest -f Mopyfile.yaml .
+```
+
 ### Build `Mopyfile` with builtctl
 
 ```bash
