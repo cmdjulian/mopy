@@ -9,6 +9,8 @@
     SETTINGS__GITLAB_URL: $CI_SERVER_URL
     SETTINGS__STANDALONE: "true"
     SETTINGS__LOG_COLOR: "true"
+    PROJECT_PATH: cmdjulian/mopy
+    DIRECTORY: /
   script:
     - cd /home/dependabot/app
     - bundle exec rake "dependabot:update[$PROJECT_PATH,$PACKAGE_MANAGER,$DIRECTORY]"
