@@ -43,7 +43,7 @@ docker:
       \"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"},
       \"$DOCKER_HUB_AUTH_URL\":{\"auth\":\"$(echo -n ${DOCKER_HUB_USER}:${DOCKER_HUB_PASSWORD} | base64)\"}
       }}" > ~/.docker/config.json
-    - ls -la
+    - realpath .
   script: >-
     buildctl-daemonless.sh build
     --frontend=dockerfile.v0
