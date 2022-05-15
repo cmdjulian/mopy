@@ -2,8 +2,8 @@ package llb
 
 import (
 	"fmt"
-	"gitlab.com/cmdjulian/mopy/config"
-	"gitlab.com/cmdjulian/mopy/utils"
+	"gitlab.com/cmdjulian/mopy/pkg/config"
+	"gitlab.com/cmdjulian/mopy/pkg/utils"
 	"runtime"
 	"strings"
 )

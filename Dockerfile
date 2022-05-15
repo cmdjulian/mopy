@@ -7,7 +7,7 @@ RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
 ARG TARGETOS TARGETARCH
 ENV GOOS=$TARGETOS GOARCH=$TARGETARCH
 RUN --mount=type=bind,target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg \
-    go build -ldflags="-s -w" -o /frontend/mopy ./main.go
+    go build -ldflags="-s -w" -o /frontend/mopy ./cmd/mopy/main.go
 RUN upx /frontend/mopy
 
 # create image with all required files for squashing in later stage

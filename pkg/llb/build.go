@@ -9,7 +9,7 @@ import (
 	"github.com/moby/buildkit/frontend/dockerfile/dockerfile2llb"
 	"github.com/moby/buildkit/frontend/gateway/client"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/mopy/config"
+	"gitlab.com/cmdjulian/mopy/pkg/config"
 )
 
 const (

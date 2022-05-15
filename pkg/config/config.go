@@ -3,7 +3,7 @@ package config
 import (
 	"fmt"
 	"github.com/pkg/errors"
-	"gitlab.com/cmdjulian/mopy/utils"
+	"gitlab.com/cmdjulian/mopy/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
 	"os"

@@ -62,9 +62,6 @@ The [example folder](example) contains a few examples how you can use `mopy`.
 DOCKER_BUILDKIT=1 docker build --ssh default -t example:latest -f Mopyfile.yaml .
 ```
 
-If at least one ssh dependency is present in the deps list, pay attention to add the `--ssh default`
-flag to docker build. Also make sure, that your ssh-key is loaded inside the ssh agent.
-
 The resulting image is build as a best practice docker image as a multistage build and
 uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
 non-root and only includes the minimal required runtime dependencies.
@@ -86,6 +83,18 @@ buildctl build \
     --local dockerfile=. \
     --output type=docker,name=example:latest \
 | docker load
+```
+
+## SSH dependencies
+
+If at least one ssh dependency is present in the deps list, pay attention to add the `--ssh default`
+flag to the build command. Also make sure, that your ssh-key is loaded inside the ssh agent.  
+If you receive an error `invalid empty ssh agent socket, make sure SSH_AUTH_SOCK is set` your SSH agent is not running
+or improperly set up. You can start or configure it and adding your ssh key by executing
+
+```bash
+eval `ssh-agent`
+ssh-add /path/to/ssh-key
 ```
 
 ## Run a container from the built image

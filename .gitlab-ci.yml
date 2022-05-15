@@ -6,7 +6,7 @@ include:
   # Gitlab static scanning
   - template: Security/SAST.gitlab-ci.yml
   # dependabot
-  - local: /.gitlab/.gitlab-ci.yml
+  - local: /.gitlab/.dependabot.gitlab-ci.yml
 
 
 stages: [ test, docker ]
@@ -28,7 +28,9 @@ container-image:
   image:
     name: moby/buildkit:v0.10.2
     entrypoint: [ "sh", "-c" ]
-  rules: [ { if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule" } ]
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
+      changes: [ Dockerfile, go.mod, cmd/**, pkg/** ]
   timeout: 10m
   needs: [ ]
   dependencies: [ ]
