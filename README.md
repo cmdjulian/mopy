@@ -141,7 +141,7 @@ You can use the created llb and pipe it directly into buildkit for testing purpo
 ```bash
 docker run --rm --privileged -d --name buildkit moby/buildkit
 export BUILDKIT_HOST=docker-container://buildkit
-go run main.go -llb=true -buildkit=false -filename=example/full/Mopyfile.yaml | \
+go run cmd/mopy/main.go -llb=true -buildkit=false -filename=example/full/Mopyfile.yaml | \
 buildctl build \
 --local context=example/full/ \
 --ssh default \
