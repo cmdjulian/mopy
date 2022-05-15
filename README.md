@@ -2,8 +2,9 @@
 
 🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
 overhead. Mopy can also create base images containing a certain set of dependencies. To run mopy no installation is
-required, as it is seemingly integrated into docker build and therefore docker build is taking care of getting and
-running it. To make use of mopy, you don't have to be a docker pro!
+required, as it is seemingly integrated and run by [buildkit](https://github.com/moby/buildkit)
+(or [docker](https://github.com/docker/buildx)). Docker build is therefor taking care of getting and running mopy.  
+To make use of mopy, you don't have to be a docker pro!
 
 ## Mopyfile
 
