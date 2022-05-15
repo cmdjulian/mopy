@@ -4,12 +4,6 @@
 overhead or just create an image containing the required pip dependencies.  
 No need to know or learn Docker!
 
-## Installation as cmd
-
-```bash
-$ go get -u gitlan.com/cmdjulian/mopy
-```
-
 ## Usage
 
 create a `Mopyfile.yaml`:
@@ -129,6 +123,12 @@ buildctl build \
 --local context=example/full/ \
 --ssh default \
 --output type=docker,name=full:latest | docker load
+```
+
+## Installation as cmd
+
+```bash
+$ go get -u gitlan.com/cmdjulian/mopy
 ```
 
 ## Credits
