@@ -1,12 +1,14 @@
 # `mopy` - a Buildkit Frontend for Python
 
 🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
-overhead or just create an image containing the required pip dependencies.  
-No need to know or learn Docker!
+overhead. Mopy can also create base images containing a certain set of dependencies. To run mopy no installation is
+required, as it is seemingly integrated into docker build and therefore docker build is taking care of getting and
+running it. To make use of mopy, you don't have to be a docker pro!
 
-## Usage
+## Mopyfile
 
-create a `Mopyfile.yaml`:
+`Mopyfile` is the equivalent of `Dockerfile` for mopy. It is based on `yaml` and assembles a python specific dsl.
+Start by creating a `Mopyfile.yaml` file:
 
 ```yaml
 #syntax=cmdjulian/mopy
@@ -29,7 +31,13 @@ pip:
 project: my-python-app/
 ```
 
-`python` is the only required field and specifies the version of the used python interpreter.
+The most important part of the file is the first line `#syntax=cmdjulian/mopy`. It tells docker buildkit to use the
+mopy frontend. The frontend is compatible with linux, windows and mac. It also supports various cpu architectures.
+Currently i386, amd64, arm/v6, arm/v7, arm64/v8 are supported. Buildkit automatically picks the right version for you
+from dockerhub.
+
+Except for the syntax directive, `python` is the only required field and specifies the version of the used version of
+the python interpreter.
 
 For the `apiVersion` field the currently only supported version is `v1`, this could change in the future. If you omit
 the version field, `v1` is assumed.
@@ -50,46 +58,53 @@ the dependencies if specified.
 
 The [example folder](example) contains a few examples how you can use `mopy`.
 
-### Build `Mopyfile` using docker build
+## Build `Mopyfile`
+
+`Mopyfile` can be build with every docker buildkit compatible cli. The following are a few examples:
+
+#### docker:
 
 ```bash
 DOCKER_BUILDKIT=1 docker build --ssh default -t example:latest -f Mopyfile.yaml .
 ```
 
-The resulting image is build as a best practice docker image as a multistage build and
-uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
-non-root and only includes the minimal required runtime dependencies.
-
-### Build `Mopyfile` with nerdctl
+#### nerdctl:
 
 ```bash
 nerdctl build --ssh default -t example:latest -f Mopyfile.yaml .
 ```
 
-### Build `Mopyfile` with builtctl
+#### buildctl:
 
 ```bash
 buildctl build \
-    --frontend=gateway.v0 \
-    --opt source=cmdjulian/mopy \
-    --ssh default \
-    --local context=. \
-    --local dockerfile=. \
-    --output type=docker,name=example:latest \
+--frontend=gateway.v0 \
+--opt source=cmdjulian/mopy \
+--ssh default \
+--local context=. \
+--local dockerfile=. \
+--output type=docker,name=example:latest \
 | docker load
 ```
 
-## SSH dependencies
+The resulting image is build as a best practice docker image and employs a multistage build- It
+uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
+non-root user and only includes the minimal required runtime dependencies.
+
+### SSH dependencies
 
 If at least one ssh dependency is present in the deps list, pay attention to add the `--ssh default`
 flag to the build command. Also make sure, that your ssh-key is loaded inside the ssh agent.  
 If you receive an error `invalid empty ssh agent socket, make sure SSH_AUTH_SOCK is set` your SSH agent is not running
-or improperly set up. You can start or configure it and adding your ssh key by executing
+or improperly set up. You can start or configure it and adding your ssh key by executing:
 
 ```bash
 eval `ssh-agent`
 ssh-add /path/to/ssh-key
 ```
+
+The `ssh` flag is only required if you're including a ssh dependency. If no ssh dependency is present, the ssh flag can
+be omitted.
 
 ## Run a container from the built image
 
@@ -99,7 +114,15 @@ The built image can be run like any other container:
 $ docker run --rm example:latest
 ```
 
-## Arguments
+## mopy development
+
+### Installation as cmd
+
+```bash
+$ go get -u gitlan.com/cmdjulian/mopy
+```
+
+### Arguments
 
 The following arguments are supported running the frontend:
 
@@ -110,7 +133,7 @@ The following arguments are supported running the frontend:
 | buildkit   |  connect to buildkit and build image  | boolean |          true |
 | filename   |           path to Mopyfile            |  string | Mopyfile.yaml |
 
-For instance to show the created equivalent Dockerfile use the
+For instance to show the created equivalent Dockerfile, use the
 command `go run main.go -buildkit=false -dockerfile=true -filename=example/full/Mopyfile.yaml`.
 
 You can use the created llb and pipe it directly into buildkit for testing purposes:
@@ -123,12 +146,6 @@ buildctl build \
 --local context=example/full/ \
 --ssh default \
 --output type=docker,name=full:latest | docker load
-```
-
-## Installation as cmd
-
-```bash
-$ go get -u gitlan.com/cmdjulian/mopy
 ```
 
 ## Credits
