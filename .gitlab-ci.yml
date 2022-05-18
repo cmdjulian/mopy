@@ -26,11 +26,11 @@ sast:
 container-image:
   stage: docker
   image:
-    name: moby/buildkit:v0.10.2
+    name: moby/buildkit:v0.10.3
     entrypoint: [ "sh", "-c" ]
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
-      changes: [ Dockerfile, go.mod, cmd/**, pkg/** ]
+      changes: [ 'Dockerfile', 'go.mod', '*.go', '.gitlab-ci.yaml' ]
   timeout: 10m
   needs: [ ]
   dependencies: [ ]
