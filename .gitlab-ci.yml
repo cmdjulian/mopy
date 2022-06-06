@@ -33,6 +33,6 @@ container-image:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
       changes: [ 'Dockerfile', 'go.mod', '*.go', '.gitlab-ci.yml' ]
   variables:
-    PUSH_IMAGES: $CI_REGISTRY_IMAGE:v1,$CI_REGISTRY_IMAGE:latest,cmdjulian/mopy:v1,cmdjulian/mopy:latest
+    PUSH_IMAGES: $CI_REGISTRY_IMAGE:v1,$CI_REGISTRY_IMAGE:latest,docker.io/cmdjulian/mopy:v1,docker.io/cmdjulian/mopy:latest
     TARGETPLATFORM: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
   tags: [ docker ]
