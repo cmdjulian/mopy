@@ -7,6 +7,9 @@ include:
   - template: Security/SAST.gitlab-ci.yml
   # dependabot
   - local: /.gitlab/.dependabot.gitlab-ci.yml
+  # container build
+  - project: cmdjulian/git-lab-ci-container-building-templates
+    file: buildkit.gitlab-ci.yml
 
 
 stages: [ test, docker ]
@@ -25,37 +28,11 @@ sast:
 
 container-image:
   stage: docker
-  image:
-    name: moby/buildkit:v0.10.3
-    entrypoint: [ "sh", "-c" ]
+  extends: .buildkit
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
       changes: [ 'Dockerfile', 'go.mod', '*.go', '.gitlab-ci.yml' ]
-  timeout: 10m
-  needs: [ ]
-  dependencies: [ ]
   variables:
-    GITLAB_RELEASE: $CI_REGISTRY_IMAGE:v1
-    GITLAB_LATEST: $CI_REGISTRY_IMAGE:latest
-    DOCKER_HUB_AUTH_URL: https://index.docker.io/v1/
-    DOCKER_HUB_RELEASE: cmdjulian/mopy:v1
-    DOCKER_HUB_LATEST: cmdjulian/mopy:latest
-    PLATFORMS: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
-  before_script:
-    - mkdir -p ~/.docker
-    # gitlab registry and docker hub login
-    - echo "{\"auths\":{
-      \"$CI_REGISTRY\":{\"auth\":\"$(echo -n ${CI_REGISTRY_USER}:${CI_REGISTRY_PASSWORD} | base64)\"},
-      \"$DOCKER_HUB_AUTH_URL\":{\"auth\":\"$(echo -n ${DOCKER_HUB_USER}:${DOCKER_HUB_PASSWORD} | base64)\"}
-      }}" > ~/.docker/config.json
-    - realpath .
-  script: >-
-    buildctl-daemonless.sh build
-    --frontend=dockerfile.v0
-    --local context=.
-    --local dockerfile=.
-    --export-cache type=inline
-    --import-cache type=registry,ref=$DOCKER_HUB_LATEST
-    --opt platform="$PLATFORMS"
-    --output type=image,\"name=$GITLAB_RELEASE,$GITLAB_LATEST,$DOCKER_HUB_RELEASE,$DOCKER_HUB_LATEST\",buildinfo-attrs=true,push=true
+    PUSH_IMAGES: $CI_REGISTRY_IMAGE:v1,$CI_REGISTRY_IMAGE:latest,cmdjulian/mopy:v1,cmdjulian/mopy:latest
+    TARGETPLATFORM: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
   tags: [ docker ]
