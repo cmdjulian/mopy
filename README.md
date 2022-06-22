@@ -11,39 +11,26 @@ To make use of mopy, you don't have to be a docker pro!
 `Mopyfile` is the equivalent of `Dockerfile` for mopy. It is based on `yaml` and assembles a python specific dsl.
 Start by creating a `Mopyfile.yaml` file:
 
-[//]: # (@formatter:on)
 ```yaml
 #syntax=cmdjulian/mopy
 
-apiVersion: v1                                         # [1] Mopyfile api version
-python: 3.9.2                                          # [2] python interpreter version
-build-deps:                                            # [3] additional 'apt' packages installed before build
-  - libopenblas-dev
-  - gfortran
-  - build-essential
-envs:                                                  # [4] environment variables available in build stage and in the final image
+apiVersion: v1
+python: 3.9.2
+build-deps: [ libopenblas-dev, gfortran, build-essential ] # additional apt dependencies installed before build
+# environment variables available in build stage and in the final image
+envs:
   MYENV: envVar1
-pip:                                                   # [5] pip dependencies to install
-  - numpy==1.22                                          # use version 1.22 of 'numpy'
-  - slycot                                               # use version 'latest' of 'slycot'
-  - git+https://github.com/moskomule/anatome.git@dev     # install 'anatome' from https git repo from branch 'dev'
-  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git     # install 'pycachesim' from ssh repo on 'default' branch
-  - ./my_local_pip/                                      # use local fs folder from working directory (has to start with ./ )
-  - ./requirements.txt                                   # include pip packages from requirements.txt file from working directory (has to start with ./ )
-labels:                                                # [6] additional labels to include in final image
-  foo: bar
-sbom: true                                             # [7] include pip dependencies as label
-project: my-python-app/                                # [8] include executable python file(s)
-```
-[//]: # (@formatter:on)
-
-WIP
-
+pip:
+  - numpy==1.22                                            # use version 1.22 of numpy
+  - slycot                                                 # use latest version of slycot
+  - git+https://github.com/moskomule/anatome.git@dev       # install anatome from https git repo from branch dev
+  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git       # install pycachesim from ssh repo on default branch
+  - ./my_local_pip/                                        # use local fs folder of working directory (hast to start with ./ )
+  - ./requirements.txt                                     # installation from requirements.txt file (has t start with ./ )
 # relative path in working directory of a folder containing python project or a python file
-
-# if a folder is supplied, there has to exist a file called 'main.py' in it
-
-# custom labels get precedence in 6
+# if a folder is supplied, there has to exist a file called main.py in it
+project: my-python-app/
+```
 
 The most important part of the file is the first line `#syntax=cmdjulian/mopy`. It tells docker buildkit to use the
 mopy frontend. The frontend is compatible with linux, windows and mac. It also supports various cpu architectures.
@@ -133,7 +120,7 @@ $ docker run --rm example:latest
 ### Installation as cmd
 
 ```bash
-$ go install gitlan.com/cmdjulian/mopy
+$ go get -u gitlan.com/cmdjulian/mopy
 ```
 
 ### Arguments
