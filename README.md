@@ -30,9 +30,9 @@ pip:                                                   # [5] pip dependencies to
   - git+ssh://git@github.com/RRZE-HPC/pycachesim.git     # install 'pycachesim' from ssh repo on 'default' branch
   - ./my_local_pip/                                      # use local fs folder from working directory (has to start with ./ )
   - ./requirements.txt                                   # include pip packages from requirements.txt file from working directory (has to start with ./ )
-labels:                                                # [6] additional labels to include in final image
+sbom: true                                             # [6] include pip dependencies as label
+labels:                                                # [7] additional labels to include in final image
   foo: bar
-sbom: true                                             # [7] include pip dependencies as label
 project: my-python-app/                                # [8] include executable python file(s)
 ```
 [//]: # (@formatter:on)
