@@ -22,14 +22,20 @@ COPY --link --from=shrinker --chown=65534:65534 /frontend/mopy /frontend/mopy
 
 # final image
 FROM --platform=$BUILDPLATFORM scratch
-LABEL org.opencontainers.image.url="https://gitlab.com/cmdjulian/mopy" \
-      org.opencontainers.image.source="https://gitlab.com/cmdjulian/mopy" \
-      org.opencontainers.image.version="v1" \
-      org.opencontainers.image.title="mopy" \
+ARG CREATED REVISION
+LABEL org.opencontainers.image.authors="cmdjulian" \
+      org.opencontainers.image.base.name="scratch" \
+      org.opencontainers.image.created=${CREATED} \
       org.opencontainers.image.description="Buildkit frontend for building Python Docker Images" \
-      org.opencontainers.image.documentation="https://gitlab.com/cmdjulian/mopy" \
-      org.opencontainers.image.authors="cmdjulian" \
-      org.opencontainers.image.licenses="MIT"
+      org.opencontainers.image.documentation="https://gitlab.com/cmdjulian/mopy/-/blob/main/README.md" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.ref.name="main" \
+      org.opencontainers.image.revision=${REVISION} \
+      org.opencontainers.image.source="https://gitlab.com/cmdjulian/mopy" \
+      org.opencontainers.image.title="mopy" \
+      org.opencontainers.image.url="https://gitlab.com/cmdjulian/mopy" \
+      org.opencontainers.image.vendor="cmdjulian" \
+      org.opencontainers.image.version="v1"
 ENV TZ=Europe/Berlin SSL_CERT_DIR=/etc/ssl/certs PATH=/frontend
 USER 65534:65534
 COPY --link --from=squash / /

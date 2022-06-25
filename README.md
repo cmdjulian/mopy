@@ -11,53 +11,85 @@ To make use of mopy, you don't have to be a docker pro!
 `Mopyfile` is the equivalent of `Dockerfile` for mopy. It is based on `yaml` and assembles a python specific dsl.
 Start by creating a `Mopyfile.yaml` file:
 
+[//]: # (@formatter:off)
 ```yaml
-#syntax=cmdjulian/mopy
+#syntax=cmdjulian/mopy                                 # [1] Enable Mopy syntax
 
-apiVersion: v1
-python: 3.9.2
-build-deps: [ libopenblas-dev, gfortran, build-essential ] # additional apt dependencies installed before build
-# environment variables available in build stage and in the final image
-envs:
+apiVersion: v1                                         # [2] Mopyfile api version
+python: 3.9.2                                          # [3] python interpreter version
+build-deps:                                            # [4] additional 'apt' packages installed before build
+  - libopenblas-dev
+  - gfortran
+  - build-essential
+envs:                                                  # [5] environment variables available in build stage and in the final image
   MYENV: envVar1
-pip:
-  - numpy==1.22                                            # use version 1.22 of numpy
-  - slycot                                                 # use latest version of slycot
-  - git+https://github.com/moskomule/anatome.git@dev       # install anatome from https git repo from branch dev
-  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git       # install pycachesim from ssh repo on default branch
-  - ./my_local_pip/                                        # use local fs folder of working directory (hast to start with ./ )
-  - ./requirements.txt                                     # installation from requirements.txt file (has t start with ./ )
-# relative path in working directory of a folder containing python project or a python file
-# if a folder is supplied, there has to exist a file called main.py in it
-project: my-python-app/
+pip:                                                   # [6] pip dependencies to install
+  - numpy==1.22                                          # use version 1.22 of 'numpy'
+  - slycot                                               # use version 'latest' of 'slycot'
+  - git+https://github.com/moskomule/anatome.git@dev     # install 'anatome' from https git repo from branch 'dev'
+  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git     # install 'pycachesim' from ssh repo on 'default' branch
+  - ./my_local_pip/                                      # use local fs folder from working directory (has to start with ./ )
+  - ./requirements.txt                                   # include pip packages from requirements.txt file from working directory (has to start with ./ )
+sbom: true                                             # [7] include pip dependencies as label
+labels:                                                # [8] additional labels to include in final image
+  foo: bar
+project: my-python-app/                                # [9] include executable python file(s)
 ```
+[//]: # (@formatter:on)
 
 The most important part of the file is the first line `#syntax=cmdjulian/mopy`. It tells docker buildkit to use the
 mopy frontend. The frontend is compatible with linux, windows and mac. It also supports various cpu architectures.
-Currently i386, amd64, arm/v6, arm/v7, arm64/v8 are supported. Buildkit automatically picks the right version for you
-from dockerhub.
+Currently `i386`, `amd64`, `arm/v6`, `arm/v7`, `arm64/v8` are supported. Buildkit automatically picks the right version
+for you from dockerhub.
 
-Except for the syntax directive, `python` is the only required field and specifies the version of the used version of
-the python interpreter.
+Availabe configuration options are listed in the table below.
 
-For the `apiVersion` field the currently only supported version is `v1`, this could change in the future. If you omit
-the version field, `v1` is assumed.
-
-`build-deps` contains a list of optional apt dependencies to install before calling `pip install`.
-
-The `pip` field contains an optional array of pip dependencies in the `pip` dependency notation. Additionally, a
-relative path to a `requirements.txt` is supported. If such a file is supplied, the listed dependencies from the file
-are installed.
-
-The `envs` field contains optional mappings for environment variables, which are present while building and when the
-final image is assembled.
-
-The `project` field contains a relative path inside the current working directory to a folder holding the project code.
-This project folder has to contain a `main.py` file. Also, a path to a single python file is supported. Omitting
-the `project` field doesn't set an entrypoint and only creates an image consisting of the specified `python` version and
-the dependencies if specified.
+|     | required | description                                                                                                                                                                                                                                                                              | default | type                    |
+|-----|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|-------------------------|
+| 1   | yes      | instruct Docker to use `Mopyfile` syntax for parsing this file                                                                                                                                                                                                                           | -       | docker syntax directive |
+| 2   | no       | api version of `Mopy` file format. This is mainly due to future development to prevent incompatibilities                                                                                                                                                                                 | v1      | enum: [`v1`]            |
+| 3   | yes      | the python interpreter version to use. Versions format is thereby: `3`, `3.9` or `3.9.1`                                                                                                                                                                                                 | -       | string                  |
+| 4   | no       | additional `apt` packages to install before staring the build. These are not part of the final image                                                                                                                                                                                     | -       | string[]                |
+| 5   | no       | additional environment variables. These are present in the build and in the run stage                                                                                                                                                                                                    | -       | map\[string]\[string]   |
+| 6   | no       | list of pip dependencies to install                                                                                                                                                                                                                                                      | -       | string[]                |
+| 7   | no       | add an sbom label. For details see the [sbom](#sbom) section                                                                                                                                                                                                                             | false   | boolean                 |
+| 8   | no       | additional labels to add to the final image. These have precedence over automatically added                                                                                                                                                                                              | -       | map\[string]\[string]   |
+| 9   | no       | relative path to a `Python` file or folder. If the path points to a folder, the folder has to contain a `main.py` file. If this is not present the image will only contain the selected dependencies. If this is present, the project or file gets set as entrypoint for the final image | -       | string                  |
 
 The [example folder](example) contains a few examples how you can use `mopy`.
+
+### sbom
+
+when the `sbom` field is set to `true`, a label called `mopy.sbom` contains a `json` representation of the supplied
+dependencies. Be aware, that when you use a dependency that contains basic in url auth credentials, these are getting
+exposed in the label. A workaround for that, is to use that sort of url in a dedicated `requirements.txt` file, as their
+content gets not included in the `json` structure. Or better use ssh links.
+Consider the following `Mopyfile`:
+
+```yaml
+#syntax=cmdjulian/mopy:v1
+
+python: 3.10
+pip:
+  - numpy==1.22
+  - catt
+  - git+https://github.com/moskomule/anatome.git@dev
+  - git+ssh://git@github.com/RRZE-HPC/pycachesim.git
+  - ./requirements.txt
+sbom: true
+```
+
+This yields the following `json` structure:
+
+```json
+[
+  "numpy==1.22",
+  "catt",
+  "git+https://github.com/moskomule/anatome.git@dev",
+  "git+ssh://git@github.com/RRZE-HPC/pycachesim.git",
+  "./requirements.txt"
+]
+```
 
 ## Build `Mopyfile`
 
@@ -120,7 +152,7 @@ $ docker run --rm example:latest
 ### Installation as cmd
 
 ```bash
-$ go get -u gitlan.com/cmdjulian/mopy
+$ go install gitlan.com/cmdjulian/mopy
 ```
 
 ### Arguments

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gitlab.com/cmdjulian/mopy/pkg/config"
 	"gitlab.com/cmdjulian/mopy/pkg/utils"
+	"golang.org/x/exp/maps"
 	"runtime"
 	"strings"
 )
@@ -159,7 +160,7 @@ func clearCachedDataFromInstall(c *config.Config) string {
 func runStage(c *config.Config) string {
 	line := "\n"
 	line += determineFinalBaseImage(c)
-	line += labels(c.PythonVersion)
+	line += labels(c)
 
 	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
 	if len(c.PipDependencies) > 0 {
@@ -184,15 +185,35 @@ func determineFinalBaseImage(c *config.Config) string {
 	return fallback(c)
 }
 
-func labels(pythonVersion string) string {
+func labels(c *config.Config) string {
 	line := "\nLABEL"
 	labels := map[string]string{
-		"mopy.python.version": pythonVersion,
+		"mopy.python.version": c.PythonVersion,
 	}
+
+	if c.Sbom {
+		labels["mopy.sbom"] = sbom(c)
+	}
+
+	maps.Copy(labels, c.Labels)
 
 	for key, value := range utils.Union(defaulLabels, labels) {
 		line += fmt.Sprintf(" %s=\"%s\"", key, value)
 	}
+
+	return line
+}
+
+func sbom(c *config.Config) string {
+	line := "["
+
+	lines := make([]string, 0)
+	for _, dependency := range c.PipDependencies {
+		lines = append(lines, fmt.Sprintf("\\\"%s\\\"", dependency))
+	}
+
+	line += strings.Join(lines, ", ")
+	line += "]"
 
 	return line
 }
@@ -215,7 +236,7 @@ func project(c *config.Config) string {
 	project := strings.TrimSuffix(c.Project, "/")
 	source := "/home/nonroot/" + utils.After(project, "/")
 	line += fmt.Sprintf("COPY --chown=nonroot:nonroot %s %s\n", c.Project, source)
-	line += "ENTRYPOINT [ \"python\", \"-u\" ]\n"
+	line += "ENTRYPOINT [ \"python\" ]\n"
 
 	if strings.HasSuffix(c.Project, ".py") {
 		line += "WORKDIR /home/nonroot\n"
