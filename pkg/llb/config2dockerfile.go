@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"gitlab.com/cmdjulian/mopy/pkg/config"
 	"gitlab.com/cmdjulian/mopy/pkg/utils"
+	"golang.org/x/exp/maps"
 	"runtime"
 	"strings"
 )
@@ -159,7 +160,7 @@ func clearCachedDataFromInstall(c *config.Config) string {
 func runStage(c *config.Config) string {
 	line := "\n"
 	line += determineFinalBaseImage(c)
-	line += labels(c.PythonVersion)
+	line += labels(c.PythonVersion, c.Labels)
 
 	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
 	if len(c.PipDependencies) > 0 {
@@ -184,11 +185,13 @@ func determineFinalBaseImage(c *config.Config) string {
 	return fallback(c)
 }
 
-func labels(pythonVersion string) string {
+func labels(pythonVersion string, additionalLabels map[string]string) string {
 	line := "\nLABEL"
 	labels := map[string]string{
 		"mopy.python.version": pythonVersion,
 	}
+
+	maps.Copy(labels, additionalLabels)
 
 	for key, value := range utils.Union(defaulLabels, labels) {
 		line += fmt.Sprintf(" %s=\"%s\"", key, value)

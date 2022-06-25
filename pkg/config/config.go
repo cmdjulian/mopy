@@ -42,6 +42,8 @@ type Config struct {
 	Envs            map[string]string `yaml:"envs"`
 	PipDependencies []string          `yaml:"pip"`
 	Project         string            `yaml:"project"`
+	Labels          map[string]string `yaml:"labels"`
+	Sbom            bool              `default:"false" yaml:"sbom"`
 }
 
 func (c *Config) Validate() error {
