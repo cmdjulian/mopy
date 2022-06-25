@@ -11,4 +11,7 @@ pip:
   - git+https://github.com/moskomule/anatome.git@dev
   - git+ssh://git@github.com/RRZE-HPC/pycachesim.git
   - ./requirements.txt
+sbom: true
+labels:
+  foo: bar
 project: my-python-app/
