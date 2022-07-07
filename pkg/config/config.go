@@ -40,10 +40,18 @@ type Config struct {
 	PythonVersion   string            `default:"3.9" yaml:"python"`
 	Apt             []string          `yaml:"build-deps"`
 	Envs            map[string]string `yaml:"envs"`
+	Indices         []Index           `yaml:"indices"`
 	PipDependencies []string          `yaml:"pip"`
 	Project         string            `yaml:"project"`
 	Labels          map[string]string `yaml:"labels"`
 	Sbom            bool              `default:"false" yaml:"sbom"`
+}
+
+type Index struct {
+	Url      string `yaml:"url"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Trust    bool   `default:"false" yaml:"trust"`
 }
 
 func (c *Config) Validate() error {

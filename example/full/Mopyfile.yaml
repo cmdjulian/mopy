@@ -5,6 +5,14 @@ python: 3.9.2
 build-deps: [ libopenblas-dev, gfortran, build-essential ]
 envs:
   MYENV: envVar1
+indices:
+  - url: http://my.pypi.org:8080/simple
+    username: user
+    password: secret
+    trust: true
+  - url: https://my.pypi.org/simple
+    username: user
+    password: secret
 pip:
   - numpy==1.22
   - slycot

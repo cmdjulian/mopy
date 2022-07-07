@@ -5,6 +5,8 @@ import (
 	"gitlab.com/cmdjulian/mopy/pkg/config"
 	"gitlab.com/cmdjulian/mopy/pkg/utils"
 	"golang.org/x/exp/maps"
+	"log"
+	"net/url"
 	"runtime"
 	"strings"
 )
@@ -53,9 +55,10 @@ func installDeps(c *config.Config) string {
 
 	flags := flags(c)
 	args := args(c)
+	indices := indices(c)
 
 	COPY := ""
-	RUN := fmt.Sprintf("\nRUN %s pip install %s", flags, args)
+	RUN := fmt.Sprintf("\nRUN %s pip install %s%s", flags, indices, args)
 
 	for i, s := range c.LocalDependencies() {
 		if !strings.HasSuffix(s, "/requirements.txt") {
@@ -69,6 +72,37 @@ func installDeps(c *config.Config) string {
 	}
 
 	return COPY + RUN
+}
+
+func indices(c *config.Config) string {
+	if len(c.Indices) <= 0 {
+		return ""
+	}
+
+	indices := ""
+
+	for _, index := range c.Indices {
+		indexUrl, err := url.Parse(index.Url)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		if len(strings.TrimSpace(index.Username)) != 0 && len(strings.TrimSpace(index.Password)) == 0 {
+			indexUrl.User = url.User(index.Username)
+		}
+
+		if len(strings.TrimSpace(index.Username)) != 0 && len(strings.TrimSpace(index.Password)) != 0 {
+			indexUrl.User = url.UserPassword(index.Username, index.Password)
+		}
+
+		indices += fmt.Sprintf("--extra-index-url %s ", indexUrl.String())
+
+		if index.Trust {
+			indices += fmt.Sprintf("--trusted-host %s ", indexUrl.Host)
+		}
+	}
+
+	return indices
 }
 
 func args(c *config.Config) string {
