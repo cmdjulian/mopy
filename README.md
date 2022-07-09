@@ -4,11 +4,11 @@
 overhead. Mopy can also create base images containing a certain set of dependencies. To run mopy no installation is
 required, as it is seemingly integrated and run by [buildkit](https://github.com/moby/buildkit)
 (or [docker](https://github.com/docker/buildx)). Docker build is therefor taking care of getting and running mopy.  
-To make use of mopy, you don't have to be a docker pro!
+To make use of `mopy`, you don't have to be a docker pro!
 
 ## Mopyfile
 
-`Mopyfile` is the equivalent of `Dockerfile` for mopy. It is based on `yaml` and assembles a python specific dsl.
+`Mopyfile` is the equivalent of `Dockerfile` for `mopy`. It is based on `yaml` and assembles a python specific dsl.
 Start by creating a `Mopyfile.yaml` file:
 
 [//]: # (@formatter:off)
@@ -51,13 +51,13 @@ mopy frontend. The frontend is compatible with linux, windows and mac. It also s
 Currently `i386`, `amd64`, `arm/v6`, `arm/v7`, `arm64/v8` are supported. Buildkit automatically picks the right version
 for you from dockerhub.
 
-Availabe configuration options are listed in the table below.
+Available configuration options are listed in the table below.
 
 |     | required | description                                                                                                                                                                                                                                                                              | default | type                    |
 |-----|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|-------------------------|
 | 1   | yes      | instruct Docker to use `Mopyfile` syntax for parsing this file                                                                                                                                                                                                                           | -       | docker syntax directive |
 | 2   | no       | api version of `Mopy` file format. This is mainly due to future development to prevent incompatibilities                                                                                                                                                                                 | v1      | enum: [`v1`]            |
-| 3   | yes      | the python interpreter version to use. Versions format is thereby: `3`, `3.9` or `3.9.1`                                                                                                                                                                                                 | -       | string                  |
+| 3   | no       | the python interpreter version to use. Versions format is thereby: `3`, `3.9` or `3.9.1`                                                                                                                                                                                                 | 3.9     | string                  |
 | 4   | no       | additional `apt` packages to install before staring the build. These are not part of the final image                                                                                                                                                                                     | -       | string[]                |
 | 5   | no       | additional environment variables. These are present in the build and in the run stage                                                                                                                                                                                                    | -       | map\[string]\[string]   |
 | 6   | no       | additional list of index to consider for installing dependencies. The only required filed is `url`.                                                                                                                                                                                      | -       | map\[string]\[registry] |
