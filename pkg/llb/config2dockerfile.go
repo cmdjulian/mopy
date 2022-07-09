@@ -7,12 +7,15 @@ import (
 	"golang.org/x/exp/maps"
 	"log"
 	"net/url"
+	"regexp"
 	"runtime"
 	"strings"
 )
 
 const pipCacheMount = "--mount=type=cache,target=/root/.cache"
 const aptCacheMount = "--mount=type=cache,target=/var/cache/apt --mount=type=cache,target=/var/lib/apt"
+
+var placeholderPattern = regexp.MustCompile(`^\$\{.+}$`)
 
 var defaultEnvs = map[string]string{
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
@@ -58,7 +61,7 @@ func installDeps(c *config.Config) string {
 	indices := indices(c)
 
 	COPY := ""
-	RUN := fmt.Sprintf("\nRUN %s pip install %s%s", flags, indices, args)
+	RUN := fmt.Sprintf("\nRUN %s pip install %s %s", flags, indices, args)
 
 	for i, s := range c.LocalDependencies() {
 		if !strings.HasSuffix(s, "/requirements.txt") {
@@ -79,7 +82,7 @@ func indices(c *config.Config) string {
 		return ""
 	}
 
-	indices := ""
+	indices := "--retries 2"
 
 	for _, index := range c.Indices {
 		indexUrl, err := url.Parse(index.Url)
@@ -95,10 +98,10 @@ func indices(c *config.Config) string {
 			indexUrl.User = url.UserPassword(index.Username, index.Password)
 		}
 
-		indices += fmt.Sprintf("--extra-index-url %s ", indexUrl.String())
+		indices += fmt.Sprintf(" --extra-index-url %s", indexUrl.String())
 
 		if index.Trust {
-			indices += fmt.Sprintf("--trusted-host %s ", indexUrl.Host)
+			indices += fmt.Sprintf(" --trusted-host %s", indexUrl.Host)
 		}
 	}
 
@@ -221,18 +224,32 @@ func determineFinalBaseImage(c *config.Config) string {
 
 func labels(c *config.Config) string {
 	line := "\nLABEL"
-	labels := map[string]string{
+	artificialLabels := map[string]string{
 		"mopy.python.version": c.PythonVersion,
 	}
 
-	if c.Sbom {
-		labels["mopy.sbom"] = sbom(c)
+	maps.Copy(artificialLabels, defaulLabels)
+
+	// add sbom if required
+	if c.Sbom == nil || *c.Sbom {
+		artificialLabels["mopy.sbom"] = sbom(c)
 	}
 
-	maps.Copy(labels, c.Labels)
-
-	for key, value := range utils.Union(defaulLabels, labels) {
+	for key, value := range artificialLabels {
 		line += fmt.Sprintf(" %s=\"%s\"", key, value)
+	}
+
+	if len(c.Labels) > 0 {
+		// allow replacement of labels with placeholder lookup
+		all := utils.Union(artificialLabels, c.Labels)
+		for key, value := range c.Labels {
+			if placeholderPattern.MatchString(value) {
+				k := value[2 : len(value)-1]
+				line += fmt.Sprintf(" %s=\"%s\"", key, all[k])
+			} else {
+				line += fmt.Sprintf(" %s=\"%s\"", key, value)
+			}
+		}
 	}
 
 	return line
@@ -242,7 +259,7 @@ func sbom(c *config.Config) string {
 	line := "["
 
 	lines := make([]string, 0)
-	for _, dependency := range c.PipDependencies {
+	for _, dependency := range c.MaskedDependencies() {
 		lines = append(lines, fmt.Sprintf("\\\"%s\\\"", dependency))
 	}
 

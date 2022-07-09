@@ -6,10 +6,15 @@ import (
 	"gitlab.com/cmdjulian/mopy/pkg/utils"
 	"gopkg.in/yaml.v3"
 	"io/ioutil"
+	"log"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
 )
+
+var httpPattern = regexp.MustCompile(`^http(s)?://`)
+var gitHttpPattern = regexp.MustCompile(`^git\+http(s)?://`)
 
 // NewFromFilename returns a new config from a filename
 func NewFromFilename(filename string) (*Config, error) {
@@ -44,7 +49,7 @@ type Config struct {
 	PipDependencies []string          `yaml:"pip"`
 	Project         string            `yaml:"project"`
 	Labels          map[string]string `yaml:"labels"`
-	Sbom            bool              `default:"false" yaml:"sbom"`
+	Sbom            *bool             `default:"true" yaml:"sbom"`
 }
 
 type Index struct {
@@ -82,6 +87,38 @@ func (c *Config) Validate() error {
 	}
 
 	return nil
+}
+
+func (c *Config) MaskedDependencies() []string {
+	dependencies := c.PipDependencies
+
+	for i, dependency := range dependencies {
+		switch {
+		case httpPattern.MatchString(dependency):
+			{
+				ref, err := url.Parse(dependency)
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				ref.User = nil
+				dependencies[i] = ref.String()
+			}
+
+		case gitHttpPattern.MatchString(dependency):
+			{
+				ref, err := url.Parse(dependency[4:])
+				if err != nil {
+					log.Fatal(err)
+				}
+
+				ref.User = nil
+				dependencies[i] = "git+" + ref.String()
+			}
+		}
+	}
+
+	return dependencies
 }
 
 func (c *Config) PyPiDependencies() []string {

@@ -3,23 +3,17 @@
 apiVersion: v1
 python: 3.9.2
 build-deps: [ libopenblas-dev, gfortran, build-essential ]
+labels:
+  fizz: buzz
+  foo: ${fizz}
 envs:
-  MYENV: envVar1
+  PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION: python
 indices:
-  - url: http://my.pypi.org:8080/simple
-    username: user
-    password: secret
-    trust: true
-  - url: https://my.pypi.org/simple
-    username: user
-    password: secret
+  - url: https://mirrors.sustech.edu.cn/pypi/simple
 pip:
   - numpy==1.22
   - slycot
-  - git+https://github.com/moskomule/anatome.git@dev
+  - git+https://user:secret@github.com/moskomule/anatome.git@dev
   - git+ssh://git@github.com/RRZE-HPC/pycachesim.git
   - ./requirements.txt
-sbom: true
-labels:
-  foo: bar
 project: my-python-app/
