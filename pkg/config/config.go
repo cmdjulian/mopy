@@ -42,7 +42,7 @@ func NewFromBytes(b []byte) (*Config, error) {
 
 type Config struct {
 	ApiVersion      string            `default:"v1" yaml:"apiVersion"`
-	PythonVersion   string            `default:"3.9" yaml:"python"`
+	PythonVersion   string            `yaml:"python"`
 	Apt             []string          `yaml:"build-deps"`
 	Envs            map[string]string `yaml:"envs"`
 	Indices         []Index           `yaml:"indices"`

@@ -1,0 +1,3 @@
+#syntax=cmdjulian/mopy:v1
+
+python: 3.9

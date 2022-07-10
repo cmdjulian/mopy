@@ -1,9 +1,9 @@
 # `mopy` - a Buildkit Frontend for Python
 
 🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
-overhead. Mopy can also create base images containing a certain set of dependencies. To run mopy no installation is
+overhead. Mopy can also create base images containing a certain set of dependencies. To run `mopy` no installation is
 required, as it is seemingly integrated and run by [buildkit](https://github.com/moby/buildkit)
-(or [docker](https://github.com/docker/buildx)). Docker build is therefor taking care of getting and running mopy.  
+(or [docker](https://github.com/docker/buildx)). Docker build is therefor taking care of getting and running `mopy`.  
 To make use of `mopy`, you don't have to be a docker pro!
 
 ## Mopyfile
@@ -13,7 +13,7 @@ Start by creating a `Mopyfile.yaml` file:
 
 [//]: # (@formatter:off)
 ```yaml
-#syntax=cmdjulian/mopy                                   # [1]  Enable Mopy syntax
+#syntax=cmdjulian/mopy                                   # [1]  Enable automatic Mopy syntax support
 
 apiVersion: v1                                           # [2]  Mopyfile api version
 python: 3.9.2                                            # [3]  python interpreter version
@@ -47,9 +47,14 @@ project: my-python-app/                                  # [10] include executab
 [//]: # (@formatter:on)
 
 The most important part of the file is the first line `#syntax=cmdjulian/mopy`. It tells docker buildkit to use the
-mopy frontend. The frontend is compatible with linux, windows and mac. It also supports various cpu architectures.
+`mopy` frontend. This can also be achieved by setting the frontend to solve the dockerfile by the running engine itself.
+For instance for the docker build command one can append the following build-arg to tell docker to use `mopy` without
+the in-file syntax directive: `--build-arg BUILDKIT_SYNTAX=cmdjulian/mopy:v1`. However, the recommended way is to set it
+in the `Mopyfile`, as this is independent of the used builder cli.
+
+The frontend is compatible with linux, windows and mac. It also supports various cpu architectures.
 Currently `i386`, `amd64`, `arm/v6`, `arm/v7`, `arm64/v8` are supported. Buildkit automatically picks the right version
-for you from dockerhub.
+for you from docker hub.
 
 Available configuration options are listed in the table below.
 
@@ -57,7 +62,7 @@ Available configuration options are listed in the table below.
 |-----|----------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------|-------------------------|
 | 1   | yes      | instruct Docker to use `Mopyfile` syntax for parsing this file                                                                                                                                                                                                                           | -       | docker syntax directive |
 | 2   | no       | api version of `Mopy` file format. This is mainly due to future development to prevent incompatibilities                                                                                                                                                                                 | v1      | enum: [`v1`]            |
-| 3   | no       | the python interpreter version to use. Versions format is thereby: `3`, `3.9` or `3.9.1`                                                                                                                                                                                                 | 3.9     | string                  |
+| 3   | yes      | the python interpreter version to use. Versions format is: `3`, `3.9` or `3.9.1`                                                                                                                                                                                                         | -       | string                  |
 | 4   | no       | additional `apt` packages to install before staring the build. These are not part of the final image                                                                                                                                                                                     | -       | string[]                |
 | 5   | no       | additional environment variables. These are present in the build and in the run stage                                                                                                                                                                                                    | -       | map\[string]\[string]   |
 | 6   | no       | additional list of index to consider for installing dependencies. The only required filed is `url`.                                                                                                                                                                                      | -       | [index](#index)\[]      |
@@ -129,7 +134,7 @@ running `docker inspect --format '{{ index .Config.Labels "mopy.sbom" }}' ${your
 
 - use `https` in favor of `http` if possible (for registries, for direct `whl` files and for `git`)
 - try to avoid setting `trust` in an index definition, rather use a trusted `https` url
-- prefer `git+ssh://git@github.com/moskomule/anatome.git` over ssh links
+- prefer `git+ssh://git@github.com/moskomule/anatome.git` over http / https links
   like `git+https://user:secret@github.com/moskomule/anatome.git`
 - in general prefer setting up an index under the `indices` key for authentication of existing pip registries, rather
   than using in-url credentials
@@ -144,8 +149,13 @@ running `docker inspect --format '{{ index .Config.Labels "mopy.sbom" }}' ${your
 #### docker:
 
 ```bash
-DOCKER_BUILDKIT=1 docker build --ssh default -t example:latest -f Mopyfile.yaml .
+DOCKER_BUILDKIT=1 docker build --ssh default --build-arg BUILDKIT_SYNTAX=cmdjulian/mopy:v1 -t example:latest -f Mopyfile.yaml .
 ```
+
+In that particular case even the syntax directive from `[1]` is not required anymore, as it is set on the `docker build`
+command directly.  
+If the syntax directive is set in the `Mopyfile`, `--build-arg BUILDKIT_SYNTAX=cmdjulian/mopy:v1` can be omitted in the
+command.
 
 #### nerdctl:
 
@@ -158,13 +168,17 @@ nerdctl build --ssh default -t example:latest -f Mopyfile.yaml .
 ```bash
 buildctl build \
 --frontend=gateway.v0 \
---opt source=cmdjulian/mopy \
+--opt source=cmdjulian/mopy:v1 \
 --ssh default \
 --local context=. \
 --local dockerfile=. \
 --output type=docker,name=example:latest \
 | docker load
 ```
+
+In that particular case even the syntax directive from `[1]` is not required anymore, as it is set on the `buildctl`
+command directly.  
+If the syntax directive is set in the `Mopyfile`, `--opt source=cmdjulian/mopy:v1` can be omitted in the command.
 
 The resulting image is build as a best practice docker image and employs a multistage build- It
 uses [google distroless](https://github.com/GoogleContainerTools/distroless) image as final base image. It runs as
@@ -213,18 +227,27 @@ The following arguments are supported running the frontend:
 | filename   |           path to Mopyfile            |  string | Mopyfile.yaml |
 
 For instance to show the created equivalent Dockerfile, use the
-command `go run main.go -buildkit=false -dockerfile=true -filename=example/full/Mopyfile.yaml`.
+command `go run cmd/mopy/main.go -buildkit=false -dockerfile -filename example/full/Mopyfile.yaml`.
 
 You can use the created llb and pipe it directly into buildkit for testing purposes:
 
 ```bash
 docker run --rm --privileged -d --name buildkit moby/buildkit
 export BUILDKIT_HOST=docker-container://buildkit
-go run cmd/mopy/main.go -llb=true -buildkit=false -filename=example/full/Mopyfile.yaml | \
-buildctl build \
---local context=example/full/ \
---ssh default \
---output type=docker,name=full:latest | docker load
+go run cmd/mopy/main.go -llb -buildkit=false -filename example/full/Mopyfile.yaml \
+| buildctl build \
+    --frontend=dockerfile.v0 \
+    --local context=example/full/ \
+    --local dockerfile=example/full/ \
+    --output type=docker,name=full:latest \
+| docker load
+```
+
+It is also possible to pipe the resulting `Dockerfile` of `mopy` directly into `docker build`:
+
+```bash
+go run cmd/mopy/main.go -buildkit=false -dockerfile -filename example/minimal/Mopyfile.yaml \
+| docker build -t minimal:latest -
 ```
 
 ## Credits
