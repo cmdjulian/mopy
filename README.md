@@ -27,7 +27,7 @@ indices:                                                 # [6]  additional pip i
   - url: https://mirrors.sustech.edu.cn/pypi/simple          # public index without authentication
   - url: http://my.pypi.org:8080/simple                    # url of the index, http and https are supported
     username: user                                         # optional username, if only username is present, only the username is used
-    password: secret                                       # optional password, this only taken into account if a username is present
+    password: secret                                       # optional password, this is only taken into account if a username is present
     trust: true                                            # should the index be added to the list of trusted hosts, use with caution (useful for self-signed certs or http links). Defaults to false, can be omitted.
 pip:                                                     # [7]  pip dependencies to install
   - numpy==1.22                                            # use version 1.22 of 'numpy'
