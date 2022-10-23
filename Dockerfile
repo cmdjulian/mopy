@@ -2,15 +2,14 @@
 
 FROM --platform=$BUILDPLATFORM golang:1.18-alpine AS builder
 WORKDIR /build
-RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add tzdata
+RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
 ARG TARGETOS TARGETARCH
 ENV GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0
 RUN --mount=type=bind,target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg \
     go build -ldflags="-s -w" -o /frontend/mopy ./cmd/mopy/main.go
 
 
-FROM --platform=linux/amd64 builder AS shrinker
-COPY --from=starudream/upx:latest /usr/bin/upx /usr/bin/upx
+FROM --platform=$BUILDPLATFORM builder AS shrinker
 RUN upx --best --ultra-brute /frontend/mopy
 
 
