@@ -10,7 +10,7 @@ RUN --mount=type=bind,target=. --mount=type=cache,target=/root/.cache/go-build -
 
 
 FROM --platform=linux/amd64 builder AS shrinker
-COPY --from=starudream/upx:latest@sha256:6f77c8fe795d114b619cf0ebd98825d5f0804ec0391a3e901102032f32c565b6 /usr/bin/upx /usr/bin/upx
+COPY --from=starudream/upx:latest /usr/bin/upx /usr/bin/upx
 RUN upx --best --ultra-brute /frontend/mopy
 
 
