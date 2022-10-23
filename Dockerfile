@@ -2,7 +2,8 @@
 
 FROM --platform=$BUILDPLATFORM golang:1.18-alpine AS builder
 WORKDIR /build
-RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
+COPY --from=starudream/upx:latest@sha256:6f77c8fe795d114b619cf0ebd98825d5f0804ec0391a3e901102032f32c565b6 /usr/bin/upx /usr/bin/upx
+RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add tzdata
 ARG TARGETOS TARGETARCH
 ENV GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0
 RUN --mount=type=bind,target=. --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg \
