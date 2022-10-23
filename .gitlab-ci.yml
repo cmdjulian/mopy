@@ -38,6 +38,6 @@ container-image:
     PUSH_IMAGES: $CI_REGISTRY_IMAGE:v1,$CI_REGISTRY_IMAGE:latest,docker.io/cmdjulian/mopy:v1,docker.io/cmdjulian/mopy:latest
     TARGETPLATFORM: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64/v8
     BUILDKIT_ARGS: >-
-      --opt build-arg:CREATED=$CI_JOB_STARTED_AT
-      --opt build-arg:REVISION=$CI_COMMIT_SHA
+      --opt label:org.opencontainers.image.created=$CI_JOB_STARTED_AT
+      --opt label:org.opencontainers.image.revision=$CI_COMMIT_SHA
   tags: [ docker ]
