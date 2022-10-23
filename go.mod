@@ -1,6 +1,6 @@
 module gitlab.com/cmdjulian/mopy
 
-go 1.18
+go 1.19
 
 require (
 	github.com/moby/buildkit v0.10.5

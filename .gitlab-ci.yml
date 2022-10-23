@@ -29,7 +29,7 @@ sast:
 container-image:
   stage: docker
   extends: .buildkit
-  timeout: 30m
+  timeout: 1h
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH && $CI_PIPELINE_SOURCE != "schedule"
       changes: [ 'Dockerfile', 'go.mod', '*.go', '.gitlab-ci.yml' ]
