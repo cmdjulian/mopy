@@ -2,12 +2,12 @@ name: Docker
 
 on:
   schedule:
-    - cron: '18 19 * * *'
+    - cron: "18 19 * * *"
   push:
-    branches: [ "main" ]
-    tags: [ 'v*.*.*' ]
+    branches: [ main ]
+    tags: [ "v*.*.*" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ main ]
 
 env:
   REGISTRY: ghcr.io
@@ -29,7 +29,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@f3c664df7af409cb4873aa5068053ba9d61a57b6
         with:
-          cosign-release: 'v1.11.0'
+          cosign-release: v1.11.0
 
       - name: Docker meta
         id: meta
@@ -42,7 +42,9 @@ jobs:
             type=schedule
             type=semver,pattern={{raw}}
             type=raw,value=latest,enable={{is_default_branch}}
-          labels:
+          labels: |
+            org.opencontainers.image.authors=cmdjulian
+            org.opencontainers.image.base.name=scratch
             org.opencontainers.image.documentation=https://github.com/cmdjulian/mopy/blob/main/README.md
             org.opencontainers.image.vendor=cmdjulian
 

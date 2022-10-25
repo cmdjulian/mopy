@@ -1,3 +1,11 @@
+[![Docker Pulls](https://badgen.net/docker/pulls/cmdjulian/mopy?icon=docker&label=pulls)](https://hub.docker.com/r/cmdjulian/mopy/)
+[![Docker Stars](https://badgen.net/docker/stars/cmdjulian/mopy?icon=docker&label=stars)](https://hub.docker.com/r/cmdjulian/mopy/)
+[![Docker Image Size](https://badgen.net/docker/size/cmdjulian/mopy?icon=docker&label=image%20size)](https://hub.docker.com/r/cmdjulian/mopy/)
+![Github stars](https://badgen.net/github/stars/cmdjulian/mopy?icon=github&label=stars)
+![Github forks](https://badgen.net/github/forks/cmdjulian/mopy?icon=github&label=forks)
+![Github issues](https://img.shields.io/github/issues/cmdjulian/mopy)
+![Github last-commit](https://img.shields.io/github/last-commit/cmdjulian/mopy)
+
 # `mopy` - a Buildkit Frontend for Python
 
 🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
@@ -12,24 +20,25 @@ To make use of `mopy`, you don't have to be a docker pro!
 Start by creating a `Mopyfile.yaml` file:
 
 [//]: # (@formatter:off)
+
 ```yaml
 #syntax=cmdjulian/mopy                                   # [1]  Enable automatic Mopy syntax support
 
 apiVersion: v1                                           # [2]  Mopyfile api version
 python: 3.9.2                                            # [3]  python interpreter version
-build-deps:                                              # [4]  additional 'apt' packages installed before build
+build-deps: # [4]  additional 'apt' packages installed before build
   - libopenblas-dev
   - gfortran
   - build-essential
-envs:                                                    # [5]  environment variables available in build stage and in the final image
+envs: # [5]  environment variables available in build stage and in the final image
   MYENV: envVar1
-indices:                                                 # [6]  additional pip indices to use
+indices: # [6]  additional pip indices to use
   - url: https://mirrors.sustech.edu.cn/pypi/simple          # public index without authentication
   - url: http://my.pypi.org:8080/simple                    # url of the index, http and https are supported
     username: user                                         # optional username, if only username is present, only the username is used
     password: secret                                       # optional password, this is only taken into account if a username is present
     trust: true                                            # should the index be added to the list of trusted hosts, use with caution (useful for self-signed certs or http links). Defaults to false, can be omitted.
-pip:                                                     # [7]  pip dependencies to install
+pip: # [7]  pip dependencies to install
   - numpy==1.22                                            # use version 1.22 of 'numpy'
   - slycot                                                 # use version 'latest' of 'slycot'
   - git+https://github.com/moskomule/anatome.git@dev       # install 'anatome' from https git repo from branch 'dev'
@@ -39,11 +48,12 @@ pip:                                                     # [7]  pip dependencies
   - ./my_local_pip/                                        # use local fs folder from working directory (has to start with ./ )
   - ./requirements.txt                                     # include pip packages from 'requirements.txt' file from working directory (has to start with ./ )
 sbom: true                                               # [8]  include pip dependencies as label
-labels:                                                  # [9]  additional labels to include in final image
+labels: # [9]  additional labels to include in final image
   foo: bar
   fizz: ${mopy.sbom}                                       # allow placeholder replacement of labels
 project: my-python-app/                                  # [10] include executable python file(s)
 ```
+
 [//]: # (@formatter:on)
 
 The most important part of the file is the first line `#syntax=cmdjulian/mopy`. It tells docker buildkit to use the
