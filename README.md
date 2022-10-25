@@ -1,10 +1,6 @@
 [![Docker Pulls](https://badgen.net/docker/pulls/cmdjulian/mopy?icon=docker&label=pulls)](https://hub.docker.com/r/cmdjulian/mopy/)
 [![Docker Stars](https://badgen.net/docker/stars/cmdjulian/mopy?icon=docker&label=stars)](https://hub.docker.com/r/cmdjulian/mopy/)
 [![Docker Image Size](https://badgen.net/docker/size/cmdjulian/mopy?icon=docker&label=image%20size)](https://hub.docker.com/r/cmdjulian/mopy/)
-![Github stars](https://badgen.net/github/stars/cmdjulian/mopy?icon=github&label=stars)
-![Github forks](https://badgen.net/github/forks/cmdjulian/mopy?icon=github&label=forks)
-![Github issues](https://img.shields.io/github/issues/cmdjulian/mopy)
-![Github last-commit](https://img.shields.io/github/last-commit/cmdjulian/mopy)
 
 # `mopy` - a Buildkit Frontend for Python
 
