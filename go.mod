@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/moby/buildkit v0.10.5
 	github.com/pkg/errors v0.9.1
-	golang.org/x/exp v0.0.0-20221023144134-a1e5550cf13e
+	golang.org/x/exp v0.0.0-20221028150844-83b7d23a625f
 	gopkg.in/yaml.v3 v3.0.1
 )
 
