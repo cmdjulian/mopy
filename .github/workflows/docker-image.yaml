@@ -1,8 +1,6 @@
 name: Docker
 
 on:
-  schedule:
-    - cron: "18 19 * * *"
   push:
     branches: [ main ]
     tags: [ "v*.*.*" ]
@@ -27,9 +25,9 @@ jobs:
 
       - name: Install cosign
         if: github.event_name != 'pull_request'
-        uses: sigstore/cosign-installer@7bca8b41164994a7dc93749d266e2f1db492f8a2
+        uses: sigstore/cosign-installer@v2.8.1
         with:
-          cosign-release: v1.11.0
+          cosign-release: v1.13.1
 
       - name: Docker meta
         id: meta
@@ -39,7 +37,6 @@ jobs:
             ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
             cmdjulian/mopy
           tags: |
-            type=schedule
             type=semver,pattern=v{{version}}
             type=semver,pattern=v{{major}}.{{minor}}
             type=semver,pattern=v{{major}}
