@@ -11,7 +11,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
 
 
 FROM --platform=$BUILDPLATFORM builder AS shrinker
-RUN upx --best --ultra-brute /frontend/mopy
+RUN upx -9 --best --ultra-brute /frontend/mopy
 
 
 FROM --platform=$BUILDPLATFORM scratch AS squash
