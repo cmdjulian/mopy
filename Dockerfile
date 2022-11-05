@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.4.3
 
-FROM --platform=$BUILDPLATFORM golang:1.19.2-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.19.3-alpine AS builder
 WORKDIR /build
 RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add upx tzdata
 COPY --link . .
