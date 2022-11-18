@@ -2,4 +2,4 @@ keras==2.4.3
 pandas
 keras_pickle_wrapper
 sklearn
-tensorflow==2.2.0
+tensorflow==2.11.0
