@@ -1,4 +1,4 @@
-FROM python:3.9.2 AS builder
+FROM python:3.11.1 AS builder
 RUN mkdir /build
 WORKDIR /build
 
