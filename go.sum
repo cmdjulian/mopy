@@ -49,8 +49,6 @@ github.com/klauspost/compress v1.15.11/go.mod h1:QPwzmACJjUTFsnSHH934V6woptycfrD
 github.com/kr/pretty v0.2.0 h1:s5hAObm+yFO5uHYt5dYjxi2rXrsnmRpJx4OYvIWUaQs=
 github.com/kr/text v0.2.0 h1:5Nx0Ya0ZqY2ygV366QzturHI13Jq95ApcVaJBhpS+AY=
 github.com/kr/text v0.2.0/go.mod h1:eLer722TekiGuMkidMxC/pM04lWEeraHUUmBw8l2grE=
-github.com/moby/buildkit v0.10.5 h1:d9krS/lG3dn6N7y+R8o9PTgIixlYAaDk35f3/B4jZOw=
-github.com/moby/buildkit v0.10.5/go.mod h1:Yajz9vt1Zw5q9Pp4pdb3TCSUXJBIroIQGQ3TTs/sLug=
 github.com/moby/buildkit v0.10.6 h1:DJlEuLIgnu34HQKF4n9Eg6q2YqQVC0eOpMb4p2eRS2w=
 github.com/moby/buildkit v0.10.6/go.mod h1:tQuuyTWtOb9D+RE425cwOCUkX0/oZ+5iBZ+uWpWQ9bU=
 github.com/moby/locker v1.0.1 h1:fOXqR41zeveg4fFODix+1Ch4mj/gT0NE1XJbp/epuBg=
@@ -89,12 +87,6 @@ golang.org/x/crypto v0.0.0-20200622213623-75b288015ac9/go.mod h1:LzIPMQfyMNhhGPh
 golang.org/x/crypto v0.1.0 h1:MDRAIl0xIo9Io2xV565hzXHw3zVseKrJKodhohM5CjU=
 golang.org/x/crypto v0.1.0/go.mod h1:RecgLatLF4+eUMCP1PoPZQb+cVrJcOPbHkTkbkB9sbw=
 golang.org/x/exp v0.0.0-20190121172915-509febef88a4/go.mod h1:CJ0aWSM057203Lf6IL+f9T1iT9GByDxfZKAQTCR3kQA=
-golang.org/x/exp v0.0.0-20221023144134-a1e5550cf13e h1:SkwG94eNiiYJhbeDE018Grw09HIN/KB9NlRmZsrzfWs=
-golang.org/x/exp v0.0.0-20221023144134-a1e5550cf13e/go.mod h1:cyybsKvd6eL0RnXn6p/Grxp8F5bW7iYuBgsNCOHpMYE=
-golang.org/x/exp v0.0.0-20221028150844-83b7d23a625f h1:Al51T6tzvuh3oiwX11vex3QgJ2XTedFPGmbEVh8cdoc=
-golang.org/x/exp v0.0.0-20221028150844-83b7d23a625f/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
-golang.org/x/exp v0.0.0-20221031165847-c99f073a8326 h1:QfTh0HpN6hlw6D3vu8DAwC8pBIwikq0AI1evdm+FksE=
-golang.org/x/exp v0.0.0-20221031165847-c99f073a8326/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/exp v0.0.0-20221111204811-129d8d6c17ab h1:1S7USr8/C0Sgk4egxq4zZ07zYt2Xh1IiFp8hUMXH/us=
 golang.org/x/exp v0.0.0-20221111204811-129d8d6c17ab/go.mod h1:CxIveKay+FTh1D0yPZemJVgC/95VzuuOLq5Qi4xnoYc=
 golang.org/x/lint v0.0.0-20181026193005-c67002cb31c3/go.mod h1:UVdnD1Gm6xHRNCYTkRU2/jEulfH38KcIWyp/GAMgvoE=

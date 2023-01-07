@@ -1,4 +1,10 @@
-example
+.dockerignore
+.git
 .github
+.gitignore
+.idea
+Dockerfile
 LICENSE
 README.md
+example
+renovate.json
