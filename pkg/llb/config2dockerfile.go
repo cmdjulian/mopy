@@ -21,8 +21,8 @@ var defaultEnvs = map[string]string{
 	"PIP_DISABLE_PIP_VERSION_CHECK": "1",
 	"PIP_NO_WARN_SCRIPT_LOCATION":   "0",
 	"PIP_USER":                      "1",
-	"PYTHONPYCACHEPREFIX":           "\"$HOME/.pycache\"",
-	"GIT_SSH_COMMAND":               "\"ssh -o StrictHostKeyChecking=no\"",
+	"PYTHONPYCACHEPREFIX":           "$HOME/.pycache",
+	"GIT_SSH_COMMAND":               "ssh -o StrictHostKeyChecking=no",
 }
 
 var defaulLabels = map[string]string{
@@ -176,7 +176,7 @@ func apt(c *config.Config) string {
 func env(envs map[string]string) string {
 	line := "\nENV"
 	for key, value := range envs {
-		line += fmt.Sprintf(" %s=%s", key, value)
+		line += fmt.Sprintf(" %s=\"%s\"", key, value)
 	}
 
 	return line
@@ -199,7 +199,8 @@ func runStage(c *config.Config) string {
 	line += determineFinalBaseImage(c)
 	line += labels(c)
 
-	line += env(utils.Union(map[string]string{"PYTHONUNBUFFERED": "1"}, c.Envs))
+	predefinedEnvs := map[string]string{"PYTHONUNBUFFERED": "1", "PATH": "$PATH:/home/nonroot/.local/bin"}
+	line += env(utils.Union(predefinedEnvs, c.Envs))
 	if len(c.PipDependencies) > 0 {
 		line += "\nCOPY --from=builder --chown=nonroot:nonroot /root/.local/ /home/nonroot/.local/"
 	}

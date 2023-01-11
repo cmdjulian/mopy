@@ -1,4 +1,4 @@
 #syntax=cmdjulian/mopy:v1
 
-python: 3.9
+python: 3.11
 project: main.py
