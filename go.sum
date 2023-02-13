@@ -19,6 +19,8 @@ github.com/containerd/containerd v1.6.14 h1:W+d0AJKVG3ioTZZyQwcw1Y3vvo6ZDYzAcjDc
 github.com/containerd/containerd v1.6.14/go.mod h1:U2NnBPIhzJDm59xF7xB2MMHnKtggpZ+phKg8o2TKj2c=
 github.com/containerd/containerd v1.6.16-0.20230124210447-1709cfe273d9 h1:zdFesNKUzj0PDylWScwyU6zv3KAKwYeSE1ZLUmi01wk=
 github.com/containerd/containerd v1.6.16-0.20230124210447-1709cfe273d9/go.mod h1:1RdCUu95+gc2v9t3IL+zIlpClSmew7/0YS8O5eQZrOw=
+github.com/containerd/containerd v1.6.16 h1:0H5xH6ABsN7XTrxIAKxFpBkFCBtrZ/OSORhCpUnHjrc=
+github.com/containerd/containerd v1.6.16/go.mod h1:1RdCUu95+gc2v9t3IL+zIlpClSmew7/0YS8O5eQZrOw=
 github.com/containerd/continuity v0.3.0 h1:nisirsYROK15TAMVukJOUyGJjz4BNQJBVsNvAXZJ/eg=
 github.com/containerd/continuity v0.3.0/go.mod h1:wJEAIwKOm/pBZuBd0JmeTvnLquTB1Ag8espWhkykbPM=
 github.com/containerd/ttrpc v1.1.0 h1:GbtyLRxb0gOLR0TYQWt3O6B0NvT8tMdorEHqIQo/lWI=
@@ -100,6 +102,8 @@ github.com/moby/buildkit v0.11.0 h1:GqBC/ETDqwdu61g4tCxX1GFZuGWg/nuqFxamb2or1dw=
 github.com/moby/buildkit v0.11.0/go.mod h1:v43oa6H2Fx/cdzc7j0UlUu8p6188yy1P3vrujAs99uw=
 github.com/moby/buildkit v0.11.2 h1:hNNsYuRssvFnp/qJ8FifStEUzROl5riPAEwk7cRzMjg=
 github.com/moby/buildkit v0.11.2/go.mod h1:b5hR8j3BZaOj5+gf6yielP9YLT9mU92zy3zZtdoUTrw=
+github.com/moby/buildkit v0.11.3 h1:bnQFPHkNJTELRb2n3HISPGvB1FWzFx+YD1MTZg8bsfk=
+github.com/moby/buildkit v0.11.3/go.mod h1:P8MqGq7YrIDldCdZLhK8M/vPcrFYZ6GX1crX0j4hOmQ=
 github.com/moby/locker v1.0.1 h1:fOXqR41zeveg4fFODix+1Ch4mj/gT0NE1XJbp/epuBg=
 github.com/moby/locker v1.0.1/go.mod h1:S7SDdo5zpBK84bzzVlKr2V0hz+7x9hWbYC/kq7oQppc=
 github.com/moby/sys/signal v0.7.0 h1:25RW3d5TnQEoKvRbEKUGay6DCQ46IxAVTT9CUMgmsSI=
