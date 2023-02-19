@@ -8,7 +8,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
     go build -ldflags="-s -w" -o /frontend/mopy ./cmd/mopy/main.go
 
 
-FROM gcr.io/distroless/static:nonroot
+FROM cgr.dev/chainguard/static:latest
 
 USER 65532:65532
 WORKDIR /home/nonroot
