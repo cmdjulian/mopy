@@ -10,8 +10,7 @@ RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/g
 
 FROM cgr.dev/chainguard/static:latest
 
-USER 65532:65532
 WORKDIR /home/nonroot
-ENTRYPOINT ["/home/nonroot/mopy"]
-
 COPY --link --from=builder --chown=65532:65532 --chmod=500 /frontend/mopy /home/nonroot/mopy
+
+ENTRYPOINT ["/home/nonroot/mopy"]
