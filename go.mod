@@ -3,7 +3,7 @@ module gitlab.com/cmdjulian/mopy
 go 1.19
 
 require (
-	github.com/containerd/containerd v1.6.16
+	github.com/containerd/containerd v1.6.18
 	github.com/moby/buildkit v0.11.3
 	github.com/opencontainers/image-spec v1.1.0-rc2
 	github.com/pkg/errors v0.9.1
