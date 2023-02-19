@@ -237,14 +237,24 @@ command `go run cmd/mopy/main.go -buildkit=false -dockerfile -filename example/f
 
 You can use the created llb and pipe it directly into buildkit for testing purposes:
 
+print as json:
+
+```bash
+docker run --rm --privileged -d --name buildkit moby/buildkit
+export BUILDKIT_HOST=docker-container://buildkit
+go run cmd/mopy/main.go -llb -buildkit=false -filename example/full/Mopyfile.yaml \
+| buildctl debug dump-llb \
+| jq .
+```
+
+load into docker:
+
 ```bash
 docker run --rm --privileged -d --name buildkit moby/buildkit
 export BUILDKIT_HOST=docker-container://buildkit
 go run cmd/mopy/main.go -llb -buildkit=false -filename example/full/Mopyfile.yaml \
 | buildctl build \
-    --frontend=dockerfile.v0 \
     --local context=example/full/ \
-    --local dockerfile=example/full/ \
     --output type=docker,name=full:latest \
 | docker load
 ```
