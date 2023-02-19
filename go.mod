@@ -3,7 +3,7 @@ module gitlab.com/cmdjulian/mopy
 go 1.19
 
 require (
-	github.com/moby/buildkit v0.11.2
+	github.com/moby/buildkit v0.11.3
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20230203172020-98cc5a0785f9
 	gopkg.in/yaml.v3 v3.0.1
@@ -12,7 +12,7 @@ require (
 require (
 	github.com/Microsoft/go-winio v0.5.2 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/containerd/containerd v1.6.16-0.20230124210447-1709cfe273d9 // indirect
+	github.com/containerd/containerd v1.6.16 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
 	github.com/containerd/ttrpc v1.1.0 // indirect
 	github.com/containerd/typeurl v1.0.2 // indirect
