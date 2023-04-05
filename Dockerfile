@@ -1,6 +1,6 @@
 # syntax = docker/dockerfile:1.5.2
 
-FROM --platform=$BUILDPLATFORM golang:1.20.2-alpine AS builder
+FROM --platform=$BUILDPLATFORM golang:1.20.3-alpine AS builder
 ARG BUILDKIT_SBOM_SCAN_STAGE=true
 WORKDIR /build
 ARG TARGETOS TARGETARCH
