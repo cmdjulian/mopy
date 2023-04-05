@@ -127,6 +127,8 @@ github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b h1
 github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b/go.mod h1:3OVijpioIKYWTqjiG0zfF6wvoJ4fAXGbjdZuI2NgsRQ=
 github.com/opencontainers/image-spec v1.1.0-rc2.0.20230316182337-dd7fd714f540 h1:FBtv5IYJ7NcFOvXeD1DYXf4lHnS525Nl7jwkFjAcjaw=
 github.com/opencontainers/image-spec v1.1.0-rc2.0.20230316182337-dd7fd714f540/go.mod h1:X4pATf0uXsnn3g5aiGIsVnJBR4mxhKzfwmvK/B2NTm8=
+github.com/opencontainers/image-spec v1.1.0-rc2.0.20230405060906-651107689bb8 h1:gPQM8/C9am1BUF0jXGPz4nhUe0QNUut528sw7LGK3QY=
+github.com/opencontainers/image-spec v1.1.0-rc2.0.20230405060906-651107689bb8/go.mod h1:X4pATf0uXsnn3g5aiGIsVnJBR4mxhKzfwmvK/B2NTm8=
 github.com/opentracing/opentracing-go v1.1.0/go.mod h1:UkNAQd3GIcIGf0SeVgPpRdFStlNbqXla1AfSYxPUl2o=
 github.com/pkg/errors v0.8.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINEl0=
 github.com/pkg/errors v0.9.1 h1:FEBLx1zS214owpjy7qsBeixbURkuhQAwrK5UwLGTwt4=
