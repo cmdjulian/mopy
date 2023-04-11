@@ -22,19 +22,19 @@ Start by creating a `Mopyfile.yaml` file:
 
 apiVersion: v1                                           # [2]  Mopyfile api version
 python: 3.9.2                                            # [3]  python interpreter version
-build-deps: # [4]  additional 'apt' packages installed before build
+build-deps:                                              # [4]  additional 'apt' packages installed before build
   - libopenblas-dev
   - gfortran
   - build-essential
-envs: # [5]  environment variables available in build stage and in the final image
+envs:                                                    # [5]  environment variables available in build stage and in the final image
   MYENV: envVar1
-indices: # [6]  additional pip indices to use
-  - url: https://mirrors.sustech.edu.cn/pypi/simple          # public index without authentication
+indices:                                                 # [6]  additional pip indices to use
+  - url: https://mirrors.sustech.edu.cn/pypi/simple        # public index without authentication
   - url: http://my.pypi.org:8080/simple                    # url of the index, http and https are supported
     username: user                                         # optional username, if only username is present, only the username is used
     password: secret                                       # optional password, this is only taken into account if a username is present
     trust: true                                            # should the index be added to the list of trusted hosts, use with caution (useful for self-signed certs or http links). Defaults to false, can be omitted.
-pip: # [7]  pip dependencies to install
+pip:                                                     # [7]  pip dependencies to install
   - numpy==1.22                                            # use version 1.22 of 'numpy'
   - slycot                                                 # use version 'latest' of 'slycot'
   - git+https://github.com/moskomule/anatome.git@dev       # install 'anatome' from https git repo from branch 'dev'
@@ -44,7 +44,7 @@ pip: # [7]  pip dependencies to install
   - ./my_local_pip/                                        # use local fs folder from working directory (has to start with ./ )
   - ./requirements.txt                                     # include pip packages from 'requirements.txt' file from working directory (has to start with ./ )
 sbom: true                                               # [8]  include pip dependencies as label
-labels: # [9]  additional labels to include in final image
+labels:                                                  # [9]  additional labels to include in final image
   foo: bar
   fizz: ${mopy.sbom}                                       # allow placeholder replacement of labels
 project: my-python-app/                                  # [10] include executable python file(s)
@@ -271,3 +271,4 @@ go run cmd/mopy/main.go -buildkit=false -dockerfile -filename example/minimal/Mo
 - https://earthly.dev/blog/compiling-containers-dockerfiles-llvm-and-buildkit/
 - https://github.com/moby/buildkit/blob/master/docs/merge%2Bdiff.md
 - https://github.com/moby/buildkit/blob/master/frontend/dockerfile/docs/syntax.md
+- https://gitlab.wikimedia.org/repos/releng/blubber
