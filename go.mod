@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/containerd/containerd v1.7.0
 	github.com/moby/buildkit v0.11.5
-	github.com/opencontainers/image-spec v1.1.0-rc2.0.20221005185240-3a7f492d3f1b
+	github.com/opencontainers/image-spec v1.1.0-rc2.0.20230427171849-77d92ec93c78
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20230420155640-133eef4313cb
 	golang.org/x/sync v0.1.0
