@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="go build gitlab.com/cmdjulian/mopy/cmd/mopy" type="GoApplicationRunConfiguration" factoryName="Go Application" nameIsGenerated="true">
+    <module name="mopy" />
+    <working_directory value="$PROJECT_DIR$" />
+    <parameters value="-buildkit=false -dockerfile -filename example/minimal/Mopyfile.yaml" />
+    <kind value="PACKAGE" />
+    <package value="gitlab.com/cmdjulian/mopy/cmd/mopy" />
+    <directory value="$PROJECT_DIR$" />
+    <filePath value="$PROJECT_DIR$/cmd/mopy/main.go" />
+    <method v="2" />
+  </configuration>
+</component>
