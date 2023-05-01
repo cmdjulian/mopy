@@ -2,15 +2,14 @@
 [![Docker Stars](https://badgen.net/docker/stars/cmdjulian/mopy?icon=docker&label=stars)](https://hub.docker.com/r/cmdjulian/mopy/)
 [![Docker Image Size](https://badgen.net/docker/size/cmdjulian/mopy?icon=docker&label=image%20size)](https://hub.docker.com/r/cmdjulian/mopy/)
 
-# `mopy` - a Buildkit Frontend for Python
+# `mopy` - build python based container images the easy way
 
 ![](logo.png)
 
-🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
-overhead. Mopy can also create base images containing a certain set of dependencies. To run `mopy` no installation is
-required, as it is seemingly integrated and run by [buildkit](https://github.com/moby/buildkit)
-(or [docker](https://github.com/docker/buildx)). Docker build is therefor taking care of getting and running `mopy`.  
-To make use of `mopy`, you don't have to be a docker pro!
+🐳 `mopy` is a YAML bases alternative to the Dockerfile format for creating best practice Python based container images.  
+As a buildkit frontend, `mopy` does not need to be installed. It is seamlessly integrated and run by [docker buildkit](https://github.com/moby/buildkit)
+(respectively [docker](https://github.com/docker/buildx)).  
+Create best practice docker images for packaging your python app with ease, without beeing a docker pro!  
 
 ## Mopyfile
 
