@@ -2,6 +2,8 @@
 [![Docker Stars](https://badgen.net/docker/stars/cmdjulian/mopy?icon=docker&label=stars)](https://hub.docker.com/r/cmdjulian/mopy/)
 [![Docker Image Size](https://badgen.net/docker/size/cmdjulian/mopy?icon=docker&label=image%20size)](https://hub.docker.com/r/cmdjulian/mopy/)
 
+![](logo.png)
+
 # `mopy` - a Buildkit Frontend for Python
 
 🐳 `mopy` is a YAML Docker-compatible alternative to the Dockerfile to package a Python application with minimal
