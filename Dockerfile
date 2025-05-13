@@ -1,17 +1,22 @@
 # syntax = docker/dockerfile:1.5.2
 
 FROM --platform=$BUILDPLATFORM golang:1.22.4-alpine AS builder
-ARG BUILDKIT_SBOM_SCAN_STAGE=true
 WORKDIR /build
+RUN --mount=type=cache,target=/etc/apk/cache apk --update-cache add tzdata
+COPY --link . .
 ARG TARGETOS TARGETARCH
 ENV GOOS=${TARGETOS} GOARCH=${TARGETARCH} CGO_ENABLED=0
-RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg --mount=source=.,target=. \
+RUN --mount=type=cache,target=/root/.cache/go-build --mount=type=cache,target=/go/pkg \
     go build -ldflags="-s -w" -o /frontend/mopy ./cmd/mopy/main.go
 
 
-FROM cgr.dev/chainguard/static:latest
+FROM --platform=$BUILDPLATFORM scratch
 
-WORKDIR /home/nonroot
-COPY --link --from=builder --chown=65532:65532 --chmod=500 /frontend/mopy /home/nonroot/mopy
+ENV TZ=Europe/Berlin SSL_CERT_DIR=/etc/ssl/certs PATH=/frontend
+USER 65534:65534
 
-ENTRYPOINT ["/home/nonroot/mopy"]
+COPY --link --from=builder /etc/passwd /etc/group /etc/
+COPY --link --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+COPY --link --from=builder --chown=65534:65534 /frontend/mopy /frontend/mopy
+
+ENTRYPOINT ["/frontend/mopy"]

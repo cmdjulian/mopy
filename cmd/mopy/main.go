@@ -63,7 +63,10 @@ func printLlb(filename string, out io.Writer) error {
 		return errors.Wrap(err, "opening Mopyfile")
 	}
 	dockerfile := llbUtils.Mopyfile2LLB(c)
-	st, _, _, _ := dockerfile2llb.Dockerfile2LLB(context.TODO(), []byte(dockerfile), dockerfile2llb.ConvertOpt{})
+	st, _, _, _, err := dockerfile2llb.Dockerfile2LLB(context.TODO(), []byte(dockerfile), dockerfile2llb.ConvertOpt{})
+	if err != nil {
+		return errors.Wrap(err, "converting Dockerfile to LLB") // Added error check
+	}
 	dt, err := st.Marshal(context.Background())
 	if err != nil {
 		return errors.Wrap(err, "marshaling llb state")

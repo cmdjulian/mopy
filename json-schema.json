@@ -1,0 +1,108 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Mopyfile",
+  "description": "Configuration for building Python-based container images using Mopy.",
+  "type": "object",
+  "properties": {
+    "apiVersion": {
+      "description": "API version of the Mopyfile format. Helps manage future compatibility.",
+      "type": "string",
+      "enum": [
+        "v1"
+      ],
+      "default": "v1"
+    },
+    "python": {
+      "description": "The Python interpreter version to use. Formats: '3', '3.9', or '3.9.1'.",
+      "type": "string",
+      "pattern": "^[23](\\.\\d{1,2}){0,2}$"
+    },
+    "build-deps": {
+      "description": "Additional 'apt' packages to install before starting the build. These are not part of the final image.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Name of the apt package."
+      },
+      "default": []
+    },
+    "envs": {
+      "description": "Additional environment variables. These are present in the build and in the run stage.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Value of the environment variable."
+      },
+      "default": {}
+    },
+    "indices": {
+      "description": "Additional list of pip indices to consider for installing dependencies.",
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/index"
+      },
+      "default": []
+    },
+    "pip": {
+      "description": "List of pip dependencies to install. Supports package names, versions, git URLs, HTTP(S) URLs, and local paths.",
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A pip dependency string (e.g., 'numpy==1.22', 'git+https://...', './local-package', './requirements.txt')."
+      },
+      "default": []
+    },
+    "sbom": {
+      "description": "Whether to add an SBOM (Software Bill of Materials) label containing pip dependencies to the image.",
+      "type": "boolean",
+      "default": true
+    },
+    "labels": {
+      "description": "Additional labels to add to the final image. These have precedence over automatically added labels. Placeholders like ${mopy.sbom} are supported.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "description": "Value of the label."
+      },
+      "default": {}
+    },
+    "project": {
+      "description": "Relative path to a Python file or folder. If a folder, it must contain a 'main.py'. Sets the entrypoint for the final image if present.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "python"
+  ],
+  "additionalProperties": false,
+  "definitions": {
+    "index": {
+      "type": "object",
+      "description": "Configuration for an additional pip index.",
+      "properties": {
+        "url": {
+          "description": "URL of the additional pip index (e.g., 'https://pypi.org/simple').",
+          "type": "string",
+          "format": "uri"
+        },
+        "username": {
+          "description": "Optional username for index authentication. Can be used for token-based auth if password is not set.",
+          "type": "string"
+        },
+        "password": {
+          "description": "Optional password for index authentication. Ignored if username is not set.",
+          "type": "string"
+        },
+        "trust": {
+          "description": "Whether to add the index's domain as a trusted host (e.g., for self-signed certificates or HTTP).",
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "required": [
+        "url"
+      ],
+      "additionalProperties": false
+    }
+  }
+}

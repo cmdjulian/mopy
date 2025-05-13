@@ -6,10 +6,12 @@
 
 ![](logo.png)
 
-🐳 `mopy` is a YAML bases alternative to the Dockerfile format for creating best practice Python based container images.  
-As a buildkit frontend, `mopy` does not need to be installed. It is seamlessly integrated and run by [docker buildkit](https://github.com/moby/buildkit)
+🐳 `mopy` is a YAML bases alternative to the Dockerfile format for creating best practice Python based container
+images.  
+As a buildkit frontend, `mopy` does not need to be installed. It is seamlessly integrated and run
+by [docker buildkit](https://github.com/moby/buildkit)
 (respectively [docker](https://github.com/docker/buildx)).  
-Create best practice docker images for packaging your python app with ease, without beeing a docker pro!  
+Create best practice docker images for packaging your python app with ease, without beeing a docker pro!
 
 ## Mopyfile
 
