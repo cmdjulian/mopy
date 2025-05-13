@@ -1,6 +1,6 @@
 module gitlab.com/cmdjulian/mopy
 
-go 1.21
+go 1.23.0
 
 toolchain go1.24.3
 
@@ -10,7 +10,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0
 	github.com/pkg/errors v0.9.1
 	golang.org/x/exp v0.0.0-20240613232115-7f521ea00fb8
-	golang.org/x/sync v0.7.0
+	golang.org/x/sync v0.14.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
