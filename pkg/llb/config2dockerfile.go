@@ -43,7 +43,6 @@ func buildStage(c *config.Config) string {
 	dockerfile += apt(c)
 	dockerfile += env(utils.Union(defaultEnvs, c.Envs))
 	dockerfile += installDeps(c)
-	dockerfile += clearCachedDataFromInstall(c)
 
 	return dockerfile
 }
@@ -177,18 +176,6 @@ func env(envs map[string]string) string {
 	line := "\nENV"
 	for key, value := range envs {
 		line += fmt.Sprintf(" %s=\"%s\"", key, value)
-	}
-
-	return line
-}
-
-func clearCachedDataFromInstall(c *config.Config) string {
-	line := "\n"
-	if len(c.PipDependencies) > 0 {
-		line += "RUN find /root/.local/lib/python*/ -name 'tests' -exec rm -r '{}' + && "
-		line += "find /root/.local/lib/python*/site-packages/ -name '*.so' -exec sh -c 'file \"{}\" | grep -q \"not stripped\" && strip -s \"{}\"' \\; && "
-		line += "find /root/.local/lib/python*/ -type f -name '*.pyc' -delete && "
-		line += "find /root/.local/lib/python*/ -type d -name '__pycache__' -delete\n"
 	}
 
 	return line
